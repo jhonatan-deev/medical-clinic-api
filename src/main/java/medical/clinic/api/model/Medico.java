@@ -1,32 +1,46 @@
 package medical.clinic.api.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import lombok.*;
-import medical.clinic.api.dto.Endereco;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import medical.clinic.api.dto.RequestDadosMedicoDTO;
 import medical.clinic.api.enuns.Especialidade;
 
 @Entity
 @Table(name = "medicos")
 @Getter
-@Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(of="id")
+@EqualsAndHashCode(of = "id")
 public class Medico {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
+
     private String nome;
+
     @Column(unique = true, nullable = false)
-    @Email(message = "Email inválido")
     private String email;
+
     @Column(unique = true, nullable = false)
     private String crm;
-    @Column(nullable = false)
+
+    @Column(unique = true, nullable = false)
+    private String telefone;
+
     @Enumerated(EnumType.STRING)
     private Especialidade especialidade;
+
     @Embedded
     private Endereco endereco;
+
+    public Medico(RequestDadosMedicoDTO dto) {
+        this.nome = dto.nome();
+        this.email = dto.email();
+        this.crm = dto.crm();
+        this.telefone = dto.telefone();
+        this.especialidade = dto.especialidade();
+        this.endereco = new Endereco(dto.endereco());
+    }
 }
