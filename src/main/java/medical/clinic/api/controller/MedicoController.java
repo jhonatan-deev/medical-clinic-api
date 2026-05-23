@@ -1,16 +1,25 @@
 package medical.clinic.api.controller;
 
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import medical.clinic.api.dto.RequestDadosMedicoDTO;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import medical.clinic.api.model.Medico;
+import medical.clinic.api.repository.MedicoRepository;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/medicos")
 public class MedicoController {
+
+    private final MedicoRepository repository;
+
+    public MedicoController(MedicoRepository repository) {
+        this.repository = repository;
+    }
+
     @PostMapping
-    public void createMedico(@RequestBody RequestDadosMedicoDTO requestDadosMedicoDTO){
-        System.out.println(requestDadosMedicoDTO);
+    @Transactional
+    public void cadastrar(@RequestBody @Valid RequestDadosMedicoDTO dto) {
+        repository.save(new Medico(dto));
     }
 }

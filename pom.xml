@@ -39,13 +39,13 @@
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
-			<version>12.6.1</version>
+			<version>10.10.0</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-mysql</artifactId>
-			<version>12.6.1</version>
+			<version>10.10.0</version>
 			<scope>compile</scope>
 		</dependency>
 
