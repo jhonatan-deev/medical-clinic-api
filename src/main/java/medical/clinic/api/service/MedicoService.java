@@ -37,9 +37,28 @@ public class MedicoService {
         Medico medicoResponse = medicoRepository.save(medico);
         return medicoMapper.toDTO(medicoResponse);
     }
+    @Transactional
+    public void deleteMedico(Long id){
+        Medico medico = medicoRepository.findById(id).orElseThrow(
+                () -> new MedicoNotFoundException("Médico não encontrado!")
+        );
+        medicoRepository.delete(medico);
+    }
 
+    @Transactional
     public Page<MedicoResponseDTO> listMedico(Pageable pageable){
-        return medicoRepository.findAll(pageable)
+        return medicoRepository.findAllByAtivoTrue(pageable)
                 .map(medicoMapper::toDTO);
+    }
+
+    @Transactional
+    public void desativarMedico(Long id){
+        Medico medico = medicoRepository.findById(id).orElseThrow(
+                ()-> new MedicoNotFoundException("Médico não encontrado!")
+        );
+        if(!medico.isAtivo()){
+            throw new RuntimeException("Médico já está inativo");
+        }
+        medico.setAtivo(false);
     }
 }

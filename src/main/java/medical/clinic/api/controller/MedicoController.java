@@ -40,4 +40,15 @@ public class MedicoController {
         return ResponseEntity.ok().body(medico);
     }
 
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> remover(@PathVariable Long id) {
+//        medicoService.deleteMedico(id);
+//        return ResponseEntity.noContent().build();
+//    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> desativar(@PathVariable Long id) {
+        medicoService.desativarMedico(id);
+        return ResponseEntity.noContent().build();
+    };
+
 }
