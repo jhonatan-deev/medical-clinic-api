@@ -3,19 +3,26 @@ package medical.clinic.api.model;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import medical.clinic.api.dto.EnderecoDTO;
 
 @Getter
 @NoArgsConstructor
 @Embeddable
 public class Endereco {
-
+    @Setter
     private String logradouro;
+    @Setter
     private String bairro;
+    @Setter
     private String cep;
+    @Setter
     private String cidade;
+    @Setter
     private String uf;
+    @Setter
     private String numero;
+    @Setter
     private String complemento;
 
     public Endereco(EnderecoDTO dto) {

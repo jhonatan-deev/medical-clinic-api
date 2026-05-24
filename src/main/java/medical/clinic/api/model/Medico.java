@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import medical.clinic.api.dto.RequestDadosMedicoDTO;
+import lombok.Setter;
+import medical.clinic.api.dto.MedicoRequestDTO;
 import medical.clinic.api.enuns.Especialidade;
 
 @Entity
@@ -17,25 +18,25 @@ public class Medico {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Setter
     private String nome;
-
+    @Setter
     @Column(unique = true, nullable = false)
     private String email;
-
+    @Setter
     @Column(unique = true, nullable = false)
     private String crm;
-
+    @Setter
     @Column(unique = true, nullable = false)
     private String telefone;
-
+    @Setter
     @Enumerated(EnumType.STRING)
     private Especialidade especialidade;
-
+    @Setter
     @Embedded
     private Endereco endereco;
 
-    public Medico(RequestDadosMedicoDTO dto) {
+    public Medico(MedicoRequestDTO dto) {
         this.nome = dto.nome();
         this.email = dto.email();
         this.crm = dto.crm();
