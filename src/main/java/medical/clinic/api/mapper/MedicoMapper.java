@@ -4,6 +4,7 @@ import medical.clinic.api.dto.EnderecoDTO;
 import medical.clinic.api.dto.MedicoRequestDTO;
 
 import medical.clinic.api.dto.MedicoResponseDTO;
+import medical.clinic.api.dto.MedicoUpdateDTO;
 import medical.clinic.api.model.Endereco;
 import medical.clinic.api.model.Medico;
 import org.springframework.stereotype.Component;
@@ -35,11 +36,24 @@ public class MedicoMapper {
 
     public MedicoResponseDTO toDTO(Medico medico){
         return new MedicoResponseDTO(
+                medico.getId(),
                 medico.getNome(),
                 medico.getEmail(),
                 medico.getCrm(),
                 medico.getEspecialidade()
         );
+    }
+
+    public void toUpdate(MedicoUpdateDTO dto, Medico medico){
+        if(dto.nome() != null && !dto.nome().isBlank()) {
+            medico.setNome(dto.nome());
+        }
+        if(dto.telefone() != null && !dto.telefone().isBlank()) {
+            medico.setTelefone(dto.telefone());
+        }
+        if(dto.endereco() != null){
+            medico.setEndereco(toEnderecoEntity(dto.endereco()));
+        }
     }
 
 }

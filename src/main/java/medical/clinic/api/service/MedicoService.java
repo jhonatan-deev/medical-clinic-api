@@ -3,6 +3,8 @@ package medical.clinic.api.service;
 import jakarta.transaction.Transactional;
 import medical.clinic.api.dto.MedicoRequestDTO;
 import medical.clinic.api.dto.MedicoResponseDTO;
+import medical.clinic.api.dto.MedicoUpdateDTO;
+import medical.clinic.api.exception.MedicoNotFoundException;
 import medical.clinic.api.mapper.MedicoMapper;
 import medical.clinic.api.model.Medico;
 import medical.clinic.api.repository.MedicoRepository;
@@ -10,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 public class MedicoService {
@@ -24,6 +25,15 @@ public class MedicoService {
     @Transactional
     public MedicoResponseDTO createMedico(MedicoRequestDTO medicoRequestDTO){
         Medico medico = medicoMapper.toEntity(medicoRequestDTO);
+        Medico medicoResponse = medicoRepository.save(medico);
+        return medicoMapper.toDTO(medicoResponse);
+    }
+
+    @Transactional
+    public MedicoResponseDTO updateMedico(MedicoUpdateDTO medicoUpdateDTO, Long id){
+        Medico medico = medicoRepository.findById(id).orElseThrow(
+                () -> new MedicoNotFoundException("Médico não Encontrado!"));
+        medicoMapper.toUpdate(medicoUpdateDTO, medico);
         Medico medicoResponse = medicoRepository.save(medico);
         return medicoMapper.toDTO(medicoResponse);
     }
