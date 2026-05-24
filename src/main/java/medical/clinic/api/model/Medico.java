@@ -35,6 +35,9 @@ public class Medico {
     @Setter
     @Embedded
     private Endereco endereco;
+    @Setter
+    @Column(nullable = false)
+    private boolean ativo = true;
 
     public Medico(MedicoRequestDTO dto) {
         this.nome = dto.nome();
@@ -43,5 +46,6 @@ public class Medico {
         this.telefone = dto.telefone();
         this.especialidade = dto.especialidade();
         this.endereco = new Endereco(dto.endereco());
+        this.ativo = true;
     }
 }

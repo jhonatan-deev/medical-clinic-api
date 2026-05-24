@@ -40,7 +40,8 @@ public class MedicoMapper {
                 medico.getNome(),
                 medico.getEmail(),
                 medico.getCrm(),
-                medico.getEspecialidade()
+                medico.getEspecialidade(),
+                medico.isAtivo()
         );
     }
 
