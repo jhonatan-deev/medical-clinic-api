@@ -4,7 +4,7 @@ import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import medical.clinic.api.dto.EnderecoDTO;
+import medical.clinic.api.dto.endereco.EnderecoDTO;
 
 @Getter
 @NoArgsConstructor

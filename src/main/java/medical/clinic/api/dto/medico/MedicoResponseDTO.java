@@ -1,4 +1,4 @@
-package medical.clinic.api.dto;
+package medical.clinic.api.dto.medico;
 
 import medical.clinic.api.enuns.Especialidade;
 

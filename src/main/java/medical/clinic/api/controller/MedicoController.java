@@ -1,9 +1,9 @@
 package medical.clinic.api.controller;
 
 import jakarta.validation.Valid;
-import medical.clinic.api.dto.MedicoRequestDTO;
-import medical.clinic.api.dto.MedicoResponseDTO;
-import medical.clinic.api.dto.MedicoUpdateDTO;
+import medical.clinic.api.dto.medico.MedicoRequestDTO;
+import medical.clinic.api.dto.medico.MedicoResponseDTO;
+import medical.clinic.api.dto.medico.MedicoUpdateDTO;
 import medical.clinic.api.service.MedicoService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

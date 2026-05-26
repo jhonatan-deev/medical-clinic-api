@@ -1,10 +1,8 @@
 package medical.clinic.api.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import medical.clinic.api.dto.paciente.PacienteRequestDTO;
 
 
 @Table(name = "pacientes")
@@ -17,41 +15,23 @@ public class Paciente {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Setter
+    @Column(nullable = false)
     private String nome;
+    @Setter
+    @Column(unique = true, nullable = false)
     private String email;
-
+    @Setter
+    @Column(unique = true, nullable = false)
     private String telefone;
-
+    @Setter
+    @Column(unique = true, nullable = false)
     private String cpf;
-
+    @Setter
     @Embedded
     private Endereco endereco;
+    @Setter
+    @Column(nullable = false)
+    private Boolean ativo = true;
 
-    private Boolean ativo;
-
-    public Paciente() {
-        this.ativo = true;
-        this.nome = dados.nome();
-        this.email = dados.email();
-        this.telefone = dados.telefone();
-        this.cpf = dados.cpf();
-        this.endereco = new Endereco(dados.endereco());
-    }
-
-    public void atualizarInformacoes(DadosAtualizacaoPaciente dados) {
-        if (dados.nome() != null) {
-            this.nome = dados.nome();
-        }
-        if (dados.telefone() != null) {
-            this.telefone = dados.telefone();
-        }
-        if (dados.endereco() != null) {
-            this.endereco.atualizarInformacoes(dados.endereco());
-        }
-
-    }
-
-    public void excluir() {
-        this.ativo = false;
-    }
 }

@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import medical.clinic.api.dto.MedicoRequestDTO;
+import medical.clinic.api.dto.medico.MedicoRequestDTO;
 import medical.clinic.api.enuns.Especialidade;
 
 @Entity
@@ -39,13 +39,4 @@ public class Medico {
     @Column(nullable = false)
     private boolean ativo = true;
 
-    public Medico(MedicoRequestDTO dto) {
-        this.nome = dto.nome();
-        this.email = dto.email();
-        this.crm = dto.crm();
-        this.telefone = dto.telefone();
-        this.especialidade = dto.especialidade();
-        this.endereco = new Endereco(dto.endereco());
-        this.ativo = true;
-    }
 }

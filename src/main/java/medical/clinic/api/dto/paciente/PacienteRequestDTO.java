@@ -7,20 +7,31 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import medical.clinic.api.dto.endereco.EnderecoDTO;
 
+
 public record PacienteRequestDTO(
-        @NotBlank
+
+        @NotBlank(message = "Nome é obrigatório")
         String nome,
-        @NotBlank
-        @Email
+
+        @NotBlank(message = "Email é obrigatório")
+        @Email(message = "Email inválido")
         String email,
-        @NotBlank
-        @Pattern(regexp = "\\d{11}")
+
+        @NotBlank(message = "Telefone é obrigatório")
+        @Pattern(
+                regexp = "\\d{11}",
+                message = "Telefone deve conter 11 números"
+        )
         String telefone,
-        @NotBlank
-        @Pattern(regexp = "\\d{3}\\.\\d{3}\\.\\d{3}\\-\\d{2}")
+
+        @NotBlank(message = "CPF é obrigatório")
+        @Pattern(
+                regexp = "\\d{3}\\.\\d{3}\\.\\d{3}\\-\\d{2}",
+                message = "CPF deve estar no formato 000.000.000-00"
+        )
         String cpf,
+
         @Valid
-        @NotNull
+        @NotNull(message = "Endereço é obrigatório")
         EnderecoDTO endereco
-) {
-}
+) {}
