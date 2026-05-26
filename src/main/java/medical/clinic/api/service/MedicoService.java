@@ -25,8 +25,8 @@ public class MedicoService {
     @Transactional
     public MedicoResponseDTO createMedico(MedicoRequestDTO medicoRequestDTO){
         Medico medico = medicoMapper.toEntity(medicoRequestDTO);
-        Medico medicoResponse = medicoRepository.save(medico);
-        return medicoMapper.toDTO(medicoResponse);
+        Medico medicoEntity = medicoRepository.save(medico);
+        return medicoMapper.toDTO(medicoEntity);
     }
 
     @Transactional
@@ -57,8 +57,15 @@ public class MedicoService {
                 ()-> new MedicoNotFoundException("Médico não encontrado!")
         );
         if(!medico.isAtivo()){
-            throw new RuntimeException("Médico já está inativo");
+            throw new RuntimeException("Médico já está inativo.");
         }
         medico.setAtivo(false);
+    }
+
+    public MedicoResponseDTO findMedicoById(Long id){
+        Medico medico = medicoRepository.findById(id).orElseThrow(
+                ()-> new MedicoNotFoundException("Médico não encontrado!")
+        );
+        return medicoMapper.toDTO(medico);
     }
 }

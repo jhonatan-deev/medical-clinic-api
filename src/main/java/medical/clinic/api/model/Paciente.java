@@ -32,6 +32,6 @@ public class Paciente {
     private Endereco endereco;
     @Setter
     @Column(nullable = false)
-    private Boolean ativo = true;
+    private boolean ativo = true;
 
 }

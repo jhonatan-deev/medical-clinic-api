@@ -1,6 +1,7 @@
 package medical.clinic.api.mapper;
 
 import medical.clinic.api.dto.paciente.PacienteRequestDTO;
+import medical.clinic.api.dto.paciente.PacienteResponseDTO;
 import medical.clinic.api.dto.paciente.PacienteUpdateDTO;
 import medical.clinic.api.model.Paciente;
 import org.springframework.stereotype.Component;
@@ -22,13 +23,12 @@ public class PacienteMapper {
         return paciente;
     }
 
-    public PacienteRequestDTO toDTO(Paciente paciente) {
-        return new PacienteRequestDTO(
+    public PacienteResponseDTO toDTO(Paciente paciente) {
+        return new PacienteResponseDTO(
+                paciente.getId(),
                 paciente.getNome(),
                 paciente.getEmail(),
-                paciente.getTelefone(),
-                paciente.getCpf(),
-                enderecoMapper.toDTO(paciente.getEndereco())
+                paciente.getCpf()
         );
     }
 
