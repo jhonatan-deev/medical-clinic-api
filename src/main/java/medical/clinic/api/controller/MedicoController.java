@@ -11,8 +11,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/medicos")
 public class MedicoController {
@@ -24,31 +22,38 @@ public class MedicoController {
     }
 
     @PostMapping
-    public ResponseEntity<MedicoResponseDTO> cadastrar(@RequestBody @Valid MedicoRequestDTO dto) {
+    public ResponseEntity<MedicoResponseDTO> createMedical(@RequestBody @Valid MedicoRequestDTO dto) {
         MedicoResponseDTO medico = medicoService.createMedico(dto);
         return ResponseEntity.ok().body(medico);
     }
 
     @GetMapping
-    public ResponseEntity<Page<MedicoResponseDTO>> listarMedicos(@PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+    public ResponseEntity<Page<MedicoResponseDTO>> listMedical(@PageableDefault(size = 10, sort = "nome") Pageable pageable) {
         return ResponseEntity.ok(medicoService.listMedico(pageable));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MedicoResponseDTO> atualizar(@RequestBody @Valid MedicoUpdateDTO dto,@PathVariable Long id) {
+    public ResponseEntity<MedicoResponseDTO> updateMedical(@RequestBody
+            MedicoUpdateDTO dto,@PathVariable Long id) {
         MedicoResponseDTO medico = medicoService.updateMedico(dto, id);
         return ResponseEntity.ok().body(medico);
     }
 
 //    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> remover(@PathVariable Long id) {
+//    public ResponseEntity<Void> deleteMedical(@PathVariable Long id) {
 //        medicoService.deleteMedico(id);
 //        return ResponseEntity.noContent().build();
 //    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> desativar(@PathVariable Long id) {
+    public ResponseEntity<Void> disableMedical(@PathVariable Long id) {
         medicoService.desativarMedico(id);
         return ResponseEntity.noContent().build();
     };
 
+    @GetMapping("/{id}")
+    public ResponseEntity<MedicoResponseDTO> getMedicalById(@PathVariable Long id) {
+        MedicoResponseDTO medico = medicoService.findMedicoById(id);
+        return ResponseEntity.ok().body(medico);
+    }
 }
