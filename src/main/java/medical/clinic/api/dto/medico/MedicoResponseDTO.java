@@ -1,6 +1,7 @@
 package medical.clinic.api.dto.medico;
 
 import medical.clinic.api.enuns.Especialidade;
+import medical.clinic.api.model.Endereco;
 
 public record MedicoResponseDTO(
         Long id,
@@ -8,6 +9,7 @@ public record MedicoResponseDTO(
         String email,
         String crm,
         Especialidade especialidade,
-        boolean ativo
+        boolean ativo,
+        Endereco endereco
 ){
 }

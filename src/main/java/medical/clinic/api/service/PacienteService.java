@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import medical.clinic.api.dto.paciente.PacienteRequestDTO;
 import medical.clinic.api.dto.paciente.PacienteResponseDTO;
 import medical.clinic.api.dto.paciente.PacienteUpdateDTO;
+import medical.clinic.api.exception.DuplicateResourceException;
 import medical.clinic.api.exception.PacienteNotFoundException;
 import medical.clinic.api.mapper.PacienteMapper;
 import medical.clinic.api.model.Paciente;
@@ -24,6 +25,12 @@ public class PacienteService {
 
     @Transactional
     public PacienteResponseDTO createPaciente(PacienteRequestDTO pacienteRequestDTO) {
+        if(pacienteRepository.existsByEmail(pacienteRequestDTO.email())){
+            throw new DuplicateResourceException("Email de usuário já existente");
+        }
+        if(pacienteRepository.existsByCpf(pacienteRequestDTO.cpf())){
+            throw new DuplicateResourceException("CPF de usuário já existente");
+        }
         Paciente paciente = pacienteMapper.toEntity(pacienteRequestDTO);
         Paciente pacienteEntity = pacienteRepository.save(paciente);
         return pacienteMapper.toDTO(pacienteEntity);

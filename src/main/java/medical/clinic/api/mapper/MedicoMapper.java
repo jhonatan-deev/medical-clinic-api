@@ -34,7 +34,8 @@ public class MedicoMapper {
                 medico.getEmail(),
                 medico.getCrm(),
                 medico.getEspecialidade(),
-                medico.isAtivo()
+                medico.isAtivo(),
+                medico.getEndereco()
         );
     }
 
