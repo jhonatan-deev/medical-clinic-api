@@ -10,6 +10,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/medicos")
@@ -22,9 +26,19 @@ public class MedicoController {
     }
 
     @PostMapping
-    public ResponseEntity<MedicoResponseDTO> createMedical(@RequestBody @Valid MedicoRequestDTO dto) {
+    public ResponseEntity<MedicoResponseDTO> createMedical(
+            @RequestBody @Valid MedicoRequestDTO dto) {
+
         MedicoResponseDTO medico = medicoService.createMedico(dto);
-        return ResponseEntity.ok().body(medico);
+
+        URI uri = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(medico.id())
+                .toUri();
+
+        return ResponseEntity.created(uri)
+                .body(medico);
     }
 
     @GetMapping

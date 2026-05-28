@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import medical.clinic.api.dto.medico.MedicoRequestDTO;
 import medical.clinic.api.dto.medico.MedicoResponseDTO;
 import medical.clinic.api.dto.medico.MedicoUpdateDTO;
+import medical.clinic.api.exception.DuplicateResourceException;
 import medical.clinic.api.exception.MedicoNotFoundException;
 import medical.clinic.api.mapper.MedicoMapper;
 import medical.clinic.api.model.Medico;
@@ -24,6 +25,12 @@ public class MedicoService {
     }
     @Transactional
     public MedicoResponseDTO createMedico(MedicoRequestDTO medicoRequestDTO){
+        if(medicoRepository.existsByEmail(medicoRequestDTO.email())){
+            throw new DuplicateResourceException("Email já cadastrado");
+        }
+        if(medicoRepository.existsByCrm(medicoRequestDTO.crm())){
+            throw new DuplicateResourceException("CRM já cadastrado");
+        }
         Medico medico = medicoMapper.toEntity(medicoRequestDTO);
         Medico medicoEntity = medicoRepository.save(medico);
         return medicoMapper.toDTO(medicoEntity);
