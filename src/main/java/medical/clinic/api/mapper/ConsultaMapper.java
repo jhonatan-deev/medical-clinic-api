@@ -12,12 +12,10 @@ import org.springframework.stereotype.Component;
 public class ConsultaMapper {
 
     public Consulta toEntity(ConsultaRequestDTO dto, Paciente paciente, Medico medico) {
-
         Consulta consulta = new Consulta();
         consulta.setPaciente(paciente);
         consulta.setMedico(medico);
         consulta.setData(dto.data());
-
         return consulta;
     }
 
