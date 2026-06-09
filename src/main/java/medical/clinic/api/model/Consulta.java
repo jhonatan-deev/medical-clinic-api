@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import medical.clinic.api.enuns.MotivoCancelamento;
 
 import java.time.LocalDateTime;
 
@@ -22,13 +23,18 @@ public class Consulta {
     @JoinColumn(name = "medico_id")
     @Setter
     private Medico medico;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paciente_id")
     @Setter
     private Paciente paciente;
     @Setter
     private LocalDateTime data;
+    @Setter
+    private MotivoCancelamento motivoCancelamento;
+    @Setter
+    private boolean ativa = true;
+    @Setter
+    private LocalDateTime dataCancelamento;
 
     public Consulta(
             Medico medico,

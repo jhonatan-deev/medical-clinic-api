@@ -1,0 +1,3 @@
+ALTER TABLE consultas
+    ADD COLUMN ativa BOOLEAN DEFAULT TRUE,
+    ADD COLUMN data_cancelamento TIMESTAMP;
