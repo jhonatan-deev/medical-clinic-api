@@ -1,5 +1,6 @@
 package medical.clinic.api.validation;
 
+import medical.clinic.api.enuns.Especialidade;
 import medical.clinic.api.exception.RegraNegocioException;
 import medical.clinic.api.model.Consulta;
 import medical.clinic.api.model.Medico;
@@ -27,13 +28,13 @@ public class ConsultaValidation {
         this.consultaRepository = consultaRepository;
     }
 
-    public void validar(Long pacienteId, Long medicoId, LocalDateTime dataHora) {
+    public void validar(Long pacienteId, Long medicoId, LocalDateTime dataHora, Especialidade especialidade) {
         validaDiaHoraDeConsulta(dataHora);
         validaAntecedenciaMinima(dataHora);
         validaPacienteAtivo(pacienteId);
         validaPacienteSemConsultaNoDia(pacienteId, dataHora);
         validaMedicoAtivo(medicoId);
-        validaMedicoDisponivel(medicoId, dataHora);
+        validaMedicoDisponivel(medicoId, dataHora, especialidade);
     }
 
     private void validaDiaHoraDeConsulta(LocalDateTime dataHora) {
@@ -100,11 +101,10 @@ public class ConsultaValidation {
         }
     }
 
-    private void validaMedicoDisponivel(Long medicoId, LocalDateTime dataHora) {
+    private void validaMedicoDisponivel(Long medicoId, LocalDateTime dataHora, Especialidade especialidade) {
 
         // CASO 1: Paciente escolheu um médico específico
         if (medicoId != null) {
-            // Verificar se esse médico já tem consulta nesse horário
             boolean medicoOcupado = consultaRepository.existsByMedicoIdAndData(medicoId, dataHora);
             if (medicoOcupado) {
                 throw new RegraNegocioException("Médico não está disponível neste horário!");
@@ -113,16 +113,21 @@ public class ConsultaValidation {
 
         // CASO 2: Paciente NÃO escolheu um médico
         else {
-            // Buscar todos os médicos ativos e disponíveis nesse horário
-            List<Medico> medicosDisponiveis = medicoRepository.findMedicosAtivosDisponiveisNaData(dataHora);
+            List<Medico> medicosDisponiveis;
 
-            // Se não houver nenhum médico disponível
-            if (medicosDisponiveis.isEmpty()) {
-                throw new RegraNegocioException("Nenhum médico disponível neste horário!");
+            if (especialidade != null) {
+                medicosDisponiveis = medicoRepository.findMedicosAtivosDisponiveisNaDataPorEspecialidade(dataHora, especialidade);
+            } else {
+                medicosDisponiveis = medicoRepository.findMedicosAtivosDisponiveisNaData(dataHora);
             }
 
-            // Escolher um médico aleatório da lista
-            // (você vai guardar esse médico para usar depois no agendamento)
+            if (medicosDisponiveis.isEmpty()) {
+                String mensagem = "Nenhum médico disponível neste horário!";
+                if (especialidade != null) {
+                    mensagem += " para a especialidade " + especialidade;
+                }
+                throw new RegraNegocioException(mensagem);
+            }
         }
     }
 

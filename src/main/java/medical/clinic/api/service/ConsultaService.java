@@ -34,7 +34,7 @@ public class ConsultaService {
     }
 
     public ConsultaResponseDTO agendar(ConsultaRequestDTO dto) {
-        consultaValidation.validar(dto.pacienteId(), dto.medicoId(), dto.data());
+        consultaValidation.validar(dto.pacienteId(), dto.medicoId(), dto.data(), dto.especialidade());
         Paciente paciente = pacienteRepository.findById(dto.pacienteId()).orElseThrow(() -> new PacienteNotFoundException("Paciente não encontrado!"));
         Medico medico;
         if(dto.medicoId() != null){
