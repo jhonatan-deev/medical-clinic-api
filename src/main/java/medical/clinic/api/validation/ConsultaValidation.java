@@ -10,6 +10,7 @@ import medical.clinic.api.repository.PacienteRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -85,18 +86,26 @@ public class ConsultaValidation {
     }
 
     private void validaPacienteSemConsultaNoDia(Long pacienteId, LocalDateTime dataHora) {
-            var dataAtual = dataHora.toLocalDate();
-            boolean existeConsulta = consultaRepository.existsByPacienteIdAndData(pacienteId, dataAtual);
-            if(existeConsulta){
-                throw new RegraNegocioException("Já existe um consulta cadastrada nesse dia tente marcar em outra data!");
-            }
+
+        var inicio = dataHora.toLocalDate().atStartOfDay();
+        var fim = dataHora.toLocalDate().atTime(23, 59, 59);
+
+        boolean existeConsulta = consultaRepository
+                .existsByPacienteIdAndDataBetween(pacienteId, inicio, fim);
+
+        if (existeConsulta) {
+            throw new RegraNegocioException(
+                    "Já existe uma consulta cadastrada nesse dia, tente marcar em outra data!"
+            );
+        }
     }
+
     private void validaMedicoDisponivel(Long medicoId, LocalDateTime dataHora) {
 
         // CASO 1: Paciente escolheu um médico específico
         if (medicoId != null) {
             // Verificar se esse médico já tem consulta nesse horário
-            boolean medicoOcupado = consultaRepository.existsByMedicoIdAndDataHora(medicoId, dataHora);
+            boolean medicoOcupado = consultaRepository.existsByMedicoIdAndData(medicoId, dataHora);
             if (medicoOcupado) {
                 throw new RegraNegocioException("Médico não está disponível neste horário!");
             }
