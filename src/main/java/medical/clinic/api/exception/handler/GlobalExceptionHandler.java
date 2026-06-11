@@ -1,6 +1,7 @@
 package medical.clinic.api.exception.handler;
 
 import medical.clinic.api.dto.ErrorResponseDTO;
+import medical.clinic.api.exception.ConsultaNotFoundException;
 import medical.clinic.api.exception.DuplicateResourceException;
 import medical.clinic.api.exception.MedicoNotFoundException;
 import medical.clinic.api.exception.PacienteNotFoundException;
@@ -19,7 +20,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({MedicoNotFoundException.class, PacienteNotFoundException.class})
+    @ExceptionHandler({MedicoNotFoundException.class, PacienteNotFoundException.class, ConsultaNotFoundException.class})
     public ResponseEntity<ErrorResponseDTO> handleException(RuntimeException ex) {
         ErrorResponseDTO error = new ErrorResponseDTO(
                 HttpStatus.NOT_FOUND.value(),
