@@ -52,7 +52,6 @@ public class MedicoService {
         medicoRepository.delete(medico);
     }
 
-    @Transactional
     public Page<MedicoResponseDTO> listMedico(Pageable pageable){
         return medicoRepository.findAllByAtivoTrue(pageable)
                 .map(medicoMapper::toDTO);
