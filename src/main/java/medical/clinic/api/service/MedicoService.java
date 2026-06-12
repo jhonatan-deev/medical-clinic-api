@@ -24,7 +24,7 @@ public class MedicoService {
         this.medicoMapper = medicoMapper;
     }
     @Transactional
-    public MedicoResponseDTO createMedico(MedicoRequestDTO medicoRequestDTO){
+    public MedicoResponseDTO createDoctor(MedicoRequestDTO medicoRequestDTO){
         if(medicoRepository.existsByEmail(medicoRequestDTO.email())){
             throw new DuplicateResourceException("Email já cadastrado");
         }
@@ -37,7 +37,7 @@ public class MedicoService {
     }
 
     @Transactional
-    public MedicoResponseDTO updateMedico(MedicoUpdateDTO medicoUpdateDTO, Long id){
+    public MedicoResponseDTO updateDoctor(MedicoUpdateDTO medicoUpdateDTO, Long id){
         Medico medico = medicoRepository.findById(id).orElseThrow(
                 () -> new MedicoNotFoundException("Médico não Encontrado!"));
         medicoMapper.toUpdate(medicoUpdateDTO, medico);
@@ -52,13 +52,13 @@ public class MedicoService {
         medicoRepository.delete(medico);
     }
 
-    public Page<MedicoResponseDTO> listMedico(Pageable pageable){
+    public Page<MedicoResponseDTO> listDoctors(Pageable pageable){
         return medicoRepository.findAllByAtivoTrue(pageable)
                 .map(medicoMapper::toDTO);
     }
 
     @Transactional
-    public void desativarMedico(Long id){
+    public void deactivateDoctor(Long id){
         Medico medico = medicoRepository.findById(id).orElseThrow(
                 ()-> new MedicoNotFoundException("Médico não encontrado!")
         );
@@ -68,7 +68,7 @@ public class MedicoService {
         medico.setAtivo(false);
     }
 
-    public MedicoResponseDTO findMedicoById(Long id){
+    public MedicoResponseDTO findDoctorById(Long id){
         Medico medico = medicoRepository.findById(id).orElseThrow(
                 ()-> new MedicoNotFoundException("Médico não encontrado!")
         );

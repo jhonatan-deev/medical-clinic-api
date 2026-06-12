@@ -49,7 +49,7 @@ public class ConsultaService {
     }
 
     @Transactional
-    public ConsultaResponseDTO agendar(ConsultaRequestDTO dto) {
+    public ConsultaResponseDTO createConsultation(ConsultaRequestDTO dto) {
         validadores.forEach(v -> v.validar(dto));
         Paciente paciente = pacienteRepository.findById(dto.pacienteId()).orElseThrow(() -> new PacienteNotFoundException("Paciente não encontrado!"));
         Medico medico;
@@ -67,7 +67,7 @@ public class ConsultaService {
     }
 
     @Transactional
-    public ConsultaResponseDTO cancelarConsulta(CancelamentoRequestDTO dto) {
+    public ConsultaResponseDTO cancelConsultation(CancelamentoRequestDTO dto) {
 
         Consulta consulta = consultaRepository.findById(dto.idConsulta()).orElseThrow(() -> new ConsultaNotFoundException("Consulta não encontrada!"));
         validadoresCancelamento.forEach(v -> v.validar(consulta));
@@ -80,7 +80,7 @@ public class ConsultaService {
         return consultaMapper.toDTO(consultaCancelada);
     }
 
-    public Page<ConsultaResponseDTO> findAllConsultas(Pageable pageable) {
+    public Page<ConsultaResponseDTO> listConsultations(Pageable pageable) {
         return consultaRepository.findByAtivaTrue(pageable).map(consultaMapper::toDTO);
     }
 }

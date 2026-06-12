@@ -1,5 +1,6 @@
 package medical.clinic.api.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import medical.clinic.api.dto.consulta.CancelamentoRequestDTO;
 import medical.clinic.api.dto.consulta.ConsultaRequestDTO;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/consultas")
+@SecurityRequirement(name = "bearer-key")
 public class ConsultaController {
     private final ConsultaService consultaService;
 
@@ -23,19 +25,19 @@ public class ConsultaController {
     }
 
     @PostMapping
-    public ResponseEntity<ConsultaResponseDTO> createConsulta(@RequestBody @Valid ConsultaRequestDTO consultaRequestDTO) {
-        ConsultaResponseDTO consulta = consultaService.agendar(consultaRequestDTO);
+    public ResponseEntity<ConsultaResponseDTO> createConsultation(@RequestBody @Valid ConsultaRequestDTO consultaRequestDTO) {
+        ConsultaResponseDTO consulta = consultaService.createConsultation(consultaRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(consulta);
     }
 
     @PostMapping("/cancelar")
-    public ResponseEntity<ConsultaResponseDTO> cancelarConsulta(@RequestBody @Valid CancelamentoRequestDTO dto) {
-        ConsultaResponseDTO consultaCancelada = consultaService.cancelarConsulta(dto);
+    public ResponseEntity<ConsultaResponseDTO> cancelConsultation(@RequestBody @Valid CancelamentoRequestDTO dto) {
+        ConsultaResponseDTO consultaCancelada = consultaService.cancelConsultation(dto);
         return ResponseEntity.status(HttpStatus.OK).body(consultaCancelada);
     }
 
     @GetMapping
-    public ResponseEntity<Page<ConsultaResponseDTO>> getAllConsultas(@PageableDefault(size = 10, sort = "data") Pageable pageable) {
-        return ResponseEntity.ok(consultaService.findAllConsultas(pageable));
+    public ResponseEntity<Page<ConsultaResponseDTO>> listConsultations(@PageableDefault(size = 10, sort = "data") Pageable pageable) {
+        return ResponseEntity.ok(consultaService.listConsultations(pageable));
     }
 }
