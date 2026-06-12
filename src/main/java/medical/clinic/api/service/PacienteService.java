@@ -24,7 +24,7 @@ public class PacienteService {
     }
 
     @Transactional
-    public PacienteResponseDTO createPaciente(PacienteRequestDTO pacienteRequestDTO) {
+    public PacienteResponseDTO createPatient(PacienteRequestDTO pacienteRequestDTO) {
         if(pacienteRepository.existsByEmail(pacienteRequestDTO.email())){
             throw new DuplicateResourceException("Email de usuário já existente");
         }
@@ -37,7 +37,7 @@ public class PacienteService {
     }
 
     @Transactional
-    public PacienteResponseDTO updatePaciente(Long id, PacienteUpdateDTO pacienteUpdateDTO) {
+    public PacienteResponseDTO updatePatient(Long id, PacienteUpdateDTO pacienteUpdateDTO) {
         Paciente paciente = pacienteRepository.findById(id).orElseThrow(
                 () -> new PacienteNotFoundException("Paciente não encontrado!"));
         pacienteMapper.toUpdate(paciente, pacienteUpdateDTO);
@@ -58,19 +58,22 @@ public class PacienteService {
     }
 
     @Transactional
-    public void deletePaciente(Long id) {
+    public void deactivatePatient(Long id) {
         Paciente paciente = pacienteRepository.findById(id).orElseThrow(
                 () -> new PacienteNotFoundException("Paciente não encontrado!")
         );
-        pacienteRepository.delete(paciente);
+        if(!paciente.isAtivo()) {
+            throw new RuntimeException("Médico já está inativo.");
+        }
+        paciente.setAtivo(false);
     }
 
-    public Page<PacienteResponseDTO> listPacientes(Pageable pageable) {
+    public Page<PacienteResponseDTO> listPatients(Pageable pageable) {
         return pacienteRepository.findByAtivoTrue(pageable)
                 .map(pacienteMapper::toDTO);
     }
 
-    public PacienteResponseDTO findPacienteById(Long id) {
+    public PacienteResponseDTO findPatientById(Long id) {
         Paciente paciente = pacienteRepository.findById(id).orElseThrow(
                 () -> new PacienteNotFoundException("Paciente não encontrado!")
         );

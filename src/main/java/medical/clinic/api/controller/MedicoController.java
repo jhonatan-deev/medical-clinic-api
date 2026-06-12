@@ -1,5 +1,6 @@
 package medical.clinic.api.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import medical.clinic.api.dto.medico.MedicoRequestDTO;
 import medical.clinic.api.dto.medico.MedicoResponseDTO;
@@ -17,6 +18,7 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/medicos")
+@SecurityRequirement(name = "bearer-key")
 public class MedicoController {
 
     private final MedicoService medicoService;
@@ -26,30 +28,19 @@ public class MedicoController {
     }
 
     @PostMapping
-    public ResponseEntity<MedicoResponseDTO> createMedical(
-            @RequestBody @Valid MedicoRequestDTO dto) {
-
-        MedicoResponseDTO medico = medicoService.createMedico(dto);
-
-        URI uri = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(medico.id())
-                .toUri();
-
-        return ResponseEntity.created(uri)
-                .body(medico);
+    public ResponseEntity<MedicoResponseDTO> createDoctor(@RequestBody @Valid MedicoRequestDTO dto) {
+        MedicoResponseDTO medico = medicoService.createDoctor(dto);
+        return ResponseEntity.status(201).body(medico);
     }
 
     @GetMapping
-    public ResponseEntity<Page<MedicoResponseDTO>> listMedical(@PageableDefault(size = 10, sort = "nome") Pageable pageable) {
-        return ResponseEntity.ok(medicoService.listMedico(pageable));
+    public ResponseEntity<Page<MedicoResponseDTO>> listDoctors(@PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+        return ResponseEntity.ok(medicoService.listDoctors(pageable));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MedicoResponseDTO> updateMedical(@RequestBody
-            MedicoUpdateDTO dto,@PathVariable Long id) {
-        MedicoResponseDTO medico = medicoService.updateMedico(dto, id);
+    public ResponseEntity<MedicoResponseDTO> updateDoctor(@RequestBody MedicoUpdateDTO dto, @PathVariable Long id) {
+        MedicoResponseDTO medico = medicoService.updateDoctor(dto, id);
         return ResponseEntity.ok().body(medico);
     }
 
@@ -60,14 +51,14 @@ public class MedicoController {
 //    }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> disableMedical(@PathVariable Long id) {
-        medicoService.desativarMedico(id);
+    public ResponseEntity<Void> deactivateDoctor(@PathVariable Long id) {
+        medicoService.deactivateDoctor(id);
         return ResponseEntity.noContent().build();
-    };
+    }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MedicoResponseDTO> getMedicalById(@PathVariable Long id) {
-        MedicoResponseDTO medico = medicoService.findMedicoById(id);
+    public ResponseEntity<MedicoResponseDTO> findDoctorById(@PathVariable Long id) {
+        MedicoResponseDTO medico = medicoService.findDoctorById(id);
         return ResponseEntity.ok().body(medico);
     }
 }
