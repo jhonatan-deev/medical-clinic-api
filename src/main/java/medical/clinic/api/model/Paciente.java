@@ -34,4 +34,21 @@ public class Paciente {
     @Column(nullable = false)
     private boolean ativo = true;
 
+
+    //Construtor para testes:
+    public Paciente(
+            String nome,
+            String email,
+            String telefone,
+            String cpf,
+            Endereco endereco,
+            boolean ativo
+    ) {
+        this.nome = nome;
+        this.email = email;
+        this.telefone = telefone;
+        this.cpf = cpf;
+        this.endereco = endereco;
+        this.ativo = ativo;
+    }
 }
