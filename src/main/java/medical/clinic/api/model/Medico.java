@@ -38,5 +38,22 @@ public class Medico {
     @Setter
     @Column(nullable = false)
     private boolean ativo = true;
-
+    //CONSTRUTOR PARA TESTE
+    public Medico(
+            String nome,
+            String email,
+            String crm,
+            String telefone,
+            Especialidade especialidade,
+            Endereco endereco,
+            boolean ativo
+    ) {
+        this.nome = nome;
+        this.email = email;
+        this.crm = crm;
+        this.telefone = telefone;
+        this.especialidade = especialidade;
+        this.endereco = endereco;
+        this.ativo = ativo;
+    }
 }

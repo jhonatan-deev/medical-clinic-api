@@ -34,4 +34,22 @@ public class Endereco {
         this.numero = dto.numero();
         this.complemento = dto.complemento();
     }
+    //Endereco pra teste
+    public Endereco(
+            String logradouro,
+            String bairro,
+            String cep,
+            String cidade,
+            String uf,
+            String numero,
+            String complemento
+    ) {
+        this.logradouro = logradouro;
+        this.bairro = bairro;
+        this.cep = cep;
+        this.cidade = cidade;
+        this.uf = uf;
+        this.numero = numero;
+        this.complemento = complemento;
+    }
 }
