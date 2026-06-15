@@ -86,7 +86,6 @@ class ConsultaRepositoryTest {
         boolean consultas = consultaRepository.existsByPacienteIdAndDataBetween(paciente.getId(),dataConsulta, dataConsultaFinal );
 
         // ASSERT
-        // verificar que retornou true
         assertTrue(consultas);
     }
 
