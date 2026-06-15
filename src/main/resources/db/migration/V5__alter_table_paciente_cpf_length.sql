@@ -1,2 +1,2 @@
-ALTER TABLE pacientes
-    MODIFY COLUMN cpf VARCHAR(14) NOT NULL;
+alter table pacientes
+alter column cpf type varchar(14);

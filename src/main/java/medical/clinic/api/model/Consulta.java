@@ -29,6 +29,7 @@ public class Consulta {
     private Paciente paciente;
     @Setter
     private LocalDateTime data;
+    @Enumerated(EnumType.STRING)
     @Setter
     private MotivoCancelamento motivoCancelamento;
     @Setter
