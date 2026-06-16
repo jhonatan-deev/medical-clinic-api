@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -23,7 +23,7 @@ public class AuthController {
     private JwtService tokenService;
     private TokenResponse tokenResponse;
 
-    @PostMapping
+    @PostMapping("/login")
     public ResponseEntity efetuarLogin(@RequestBody @Valid LoginRequest dados){
         var autenticationToken = new UsernamePasswordAuthenticationToken(dados.login(), dados.senha());
         var authentication = authenticationManager.authenticate(autenticationToken);

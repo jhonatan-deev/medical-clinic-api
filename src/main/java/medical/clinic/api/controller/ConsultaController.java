@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/consultas")
+@RequestMapping("/api/v1/consultas")
 @SecurityRequirement(name = "bearer-key")
 public class ConsultaController {
     private final ConsultaService consultaService;
