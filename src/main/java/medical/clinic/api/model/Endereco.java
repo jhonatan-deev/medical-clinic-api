@@ -1,5 +1,6 @@
 package medical.clinic.api.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ public class Endereco {
     @Setter
     private String cidade;
     @Setter
+    @Column(name = "uf", length = 2)
     private String uf;
     @Setter
     private String numero;
