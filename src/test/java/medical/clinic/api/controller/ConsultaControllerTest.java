@@ -99,7 +99,12 @@ class ConsultaControllerTest {
         medicoRepository.save(medico);
         pacienteRepository.save(paciente);
 
-        LocalDateTime dataConsulta = LocalDateTime.now().plusDays(1);
+        LocalDateTime dataConsulta = LocalDateTime.now()
+                .plusDays(1)
+                .withHour(10)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0);
 
         ConsultaRequestDTO dto = new ConsultaRequestDTO(
                 medico.getId(),
