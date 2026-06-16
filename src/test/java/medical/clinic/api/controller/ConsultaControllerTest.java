@@ -82,7 +82,7 @@ class ConsultaControllerTest {
     @DisplayName("Deve devolver codigo http 400 quando informacaoes estão invalidas")
     @WithMockUser
     void agendar_cenario1() throws Exception {
-        var response = mockMvc.perform(post("/consultas")).andReturn().getResponse();
+        var response = mockMvc.perform(post("/api/v1/consultas")).andReturn().getResponse();
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
@@ -115,7 +115,7 @@ class ConsultaControllerTest {
 
         // ACT
         var response = mockMvc.perform(
-                        post("/consultas")
+                        post("/api/v1/consultas")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(dto))
                 )

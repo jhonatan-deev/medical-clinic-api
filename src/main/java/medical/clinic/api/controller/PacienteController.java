@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/pacientes")
+@RequestMapping("/api/v1/pacientes")
 @SecurityRequirement(name = "bearer-key")
 public class PacienteController {
     private final PacienteService pacienteService;
