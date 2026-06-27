@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,15 +18,44 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class Usuario implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String login;
+
+    @Setter
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Setter
+    @Column(nullable = false)
     private String senha;
+
+    public Usuario(String email, String senha) {
+        validarEmail(email);
+        validarSenha(senha);
+
+        this.email = email;
+        this.senha = senha;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return List.of(
+                new SimpleGrantedAuthority("ROLE_USER")
+        );
+    }
+
+    private void validarEmail(String email) {
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("Email não pode ser vazio.");
+        }
+    }
+
+    private void validarSenha(String senha) {
+        if (senha == null || senha.length() < 6) {
+            throw new IllegalArgumentException("A senha deve ter no mínimo 6 caracteres.");
+        }
     }
 
     @Override
@@ -35,7 +65,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public String getUsername() {
-        return login;
+        return email;
     }
 
     @Override

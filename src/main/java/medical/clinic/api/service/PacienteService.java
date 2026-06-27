@@ -8,6 +8,7 @@ import medical.clinic.api.exception.DuplicateResourceException;
 import medical.clinic.api.exception.PacienteNotFoundException;
 import medical.clinic.api.mapper.PacienteMapper;
 import medical.clinic.api.model.Paciente;
+import medical.clinic.api.model.Usuario;
 import medical.clinic.api.repository.PacienteRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,23 +18,24 @@ import org.springframework.stereotype.Service;
 public class PacienteService {
     private final PacienteRepository pacienteRepository;
     private final PacienteMapper pacienteMapper;
+    private final UsuarioService usuarioService;
 
-    public PacienteService(PacienteRepository pacienteRepository, PacienteMapper pacienteMapper) {
+    public PacienteService(PacienteRepository pacienteRepository, PacienteMapper pacienteMapper, UsuarioService usuarioService) {
         this.pacienteRepository = pacienteRepository;
         this.pacienteMapper = pacienteMapper;
+        this.usuarioService = usuarioService;
     }
 
     @Transactional
-    public PacienteResponseDTO createPatient(PacienteRequestDTO pacienteRequestDTO) {
-        if(pacienteRepository.existsByEmail(pacienteRequestDTO.email())){
-            throw new DuplicateResourceException("Email de usuário já existente");
+    public PacienteResponseDTO createPatient(PacienteRequestDTO dto) {
+        if (pacienteRepository.existsByCpf(dto.cpf())) {
+            throw new DuplicateResourceException("CPF de usuário já existente.");
         }
-        if(pacienteRepository.existsByCpf(pacienteRequestDTO.cpf())){
-            throw new DuplicateResourceException("CPF de usuário já existente");
-        }
-        Paciente paciente = pacienteMapper.toEntity(pacienteRequestDTO);
-        Paciente pacienteEntity = pacienteRepository.save(paciente);
-        return pacienteMapper.toDTO(pacienteEntity);
+        Usuario usuario = usuarioService.criarUsuario(dto.usuario());
+        Paciente paciente = pacienteMapper.toEntity(dto);
+        paciente.setUsuario(usuario);
+        Paciente pacienteSalvo = pacienteRepository.save(paciente);
+        return pacienteMapper.toDTO(pacienteSalvo);
     }
 
     @Transactional

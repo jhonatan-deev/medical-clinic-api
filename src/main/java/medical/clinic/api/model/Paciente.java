@@ -20,9 +20,6 @@ public class Paciente {
     private String nome;
     @Setter
     @Column(unique = true, nullable = false)
-    private String email;
-    @Setter
-    @Column(unique = true, nullable = false)
     private String telefone;
     @Setter
     @Column(unique = true, nullable = false)
@@ -33,19 +30,21 @@ public class Paciente {
     @Setter
     @Column(nullable = false)
     private boolean ativo = true;
+    @Setter
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 
 
     //Construtor para testes:
     public Paciente(
             String nome,
-            String email,
             String telefone,
             String cpf,
             Endereco endereco,
             boolean ativo
     ) {
         this.nome = nome;
-        this.email = email;
         this.telefone = telefone;
         this.cpf = cpf;
         this.endereco = endereco;

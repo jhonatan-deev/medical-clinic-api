@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import medical.clinic.api.dto.endereco.EnderecoDTO;
+import medical.clinic.api.dto.usuario.UsuarioRequestDTO;
+import medical.clinic.api.model.Usuario;
 
 
 public record PacienteRequestDTO(
@@ -33,5 +35,9 @@ public record PacienteRequestDTO(
 
         @Valid
         @NotNull(message = "Endereço é obrigatório")
-        EnderecoDTO endereco
+        EnderecoDTO endereco,
+
+        @Valid
+        @NotNull
+        UsuarioRequestDTO usuario
 ) {}

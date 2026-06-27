@@ -18,7 +18,6 @@ public class MedicoMapper {
         public Medico toEntity(MedicoRequestDTO dto) {
         Medico medico = new Medico();
         medico.setNome(dto.nome());
-        medico.setEmail(dto.email());
         medico.setCrm(dto.crm());
         medico.setTelefone(dto.telefone());
         medico.setEspecialidade(dto.especialidade());
@@ -31,7 +30,6 @@ public class MedicoMapper {
         return new MedicoResponseDTO(
                 medico.getId(),
                 medico.getNome(),
-                medico.getEmail(),
                 medico.getCrm(),
                 medico.getEspecialidade(),
                 medico.isAtivo(),

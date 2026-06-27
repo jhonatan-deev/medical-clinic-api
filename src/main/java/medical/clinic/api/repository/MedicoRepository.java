@@ -29,6 +29,5 @@ public interface MedicoRepository extends JpaRepository<Medico, Long> {
             @Param("dataHora") LocalDateTime dataHora,
             @Param("especialidade") Especialidade especialidade
     );
-    boolean existsByEmail(String email);
     boolean existsByCrm(String crm);
 }

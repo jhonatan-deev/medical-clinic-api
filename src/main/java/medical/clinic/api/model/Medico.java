@@ -22,9 +22,6 @@ public class Medico {
     private String nome;
     @Setter
     @Column(unique = true, nullable = false)
-    private String email;
-    @Setter
-    @Column(unique = true, nullable = false)
     private String crm;
     @Setter
     @Column(unique = true, nullable = false)
@@ -38,10 +35,14 @@ public class Medico {
     @Setter
     @Column(nullable = false)
     private boolean ativo = true;
+    @Setter
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
+
     //CONSTRUTOR PARA TESTE
     public Medico(
             String nome,
-            String email,
             String crm,
             String telefone,
             Especialidade especialidade,
@@ -49,7 +50,6 @@ public class Medico {
             boolean ativo
     ) {
         this.nome = nome;
-        this.email = email;
         this.crm = crm;
         this.telefone = telefone;
         this.especialidade = especialidade;

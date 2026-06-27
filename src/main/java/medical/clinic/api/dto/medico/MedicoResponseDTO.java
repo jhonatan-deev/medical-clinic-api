@@ -6,7 +6,6 @@ import medical.clinic.api.model.Endereco;
 public record MedicoResponseDTO(
         Long id,
         String nome,
-        String email,
         String crm,
         Especialidade especialidade,
         boolean ativo,

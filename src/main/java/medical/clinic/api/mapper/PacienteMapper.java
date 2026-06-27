@@ -16,7 +16,6 @@ public class PacienteMapper {
     public Paciente toEntity(PacienteRequestDTO dto) {
         Paciente paciente = new Paciente();
         paciente.setNome(dto.nome());
-        paciente.setEmail(dto.email());
         paciente.setTelefone(dto.telefone());
         paciente.setCpf(dto.cpf());
         paciente.setEndereco(enderecoMapper.toEntity(dto.endereco()));
@@ -27,7 +26,6 @@ public class PacienteMapper {
         return new PacienteResponseDTO(
                 paciente.getId(),
                 paciente.getNome(),
-                paciente.getEmail(),
                 paciente.getCpf()
         );
     }
