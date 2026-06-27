@@ -8,7 +8,9 @@ import medical.clinic.api.exception.DuplicateResourceException;
 import medical.clinic.api.exception.MedicoNotFoundException;
 import medical.clinic.api.mapper.MedicoMapper;
 import medical.clinic.api.model.Medico;
+import medical.clinic.api.model.Usuario;
 import medical.clinic.api.repository.MedicoRepository;
+import medical.clinic.api.repository.UsuarioRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,22 +20,25 @@ import org.springframework.stereotype.Service;
 public class MedicoService {
     private final MedicoRepository medicoRepository;
     private final MedicoMapper medicoMapper;
+    private final UsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService;
 
-    public MedicoService(MedicoRepository medicoRepository, MedicoMapper medicoMapper) {
+    public MedicoService(MedicoRepository medicoRepository, MedicoMapper medicoMapper, UsuarioRepository usuarioRepository, UsuarioService usuarioService) {
         this.medicoRepository = medicoRepository;
         this.medicoMapper = medicoMapper;
+        this.usuarioRepository = usuarioRepository;
+        this.usuarioService = usuarioService;
     }
     @Transactional
-    public MedicoResponseDTO createDoctor(MedicoRequestDTO medicoRequestDTO){
-        if(medicoRepository.existsByEmail(medicoRequestDTO.email())){
-            throw new DuplicateResourceException("Email já cadastrado");
+    public MedicoResponseDTO createDoctor(MedicoRequestDTO dto) {
+        if (medicoRepository.existsByCrm(dto.crm())) {
+            throw new DuplicateResourceException("CRM já cadastrado.");
         }
-        if(medicoRepository.existsByCrm(medicoRequestDTO.crm())){
-            throw new DuplicateResourceException("CRM já cadastrado");
-        }
-        Medico medico = medicoMapper.toEntity(medicoRequestDTO);
-        Medico medicoEntity = medicoRepository.save(medico);
-        return medicoMapper.toDTO(medicoEntity);
+        Usuario usuario = usuarioService.criarUsuario(dto.usuario());
+        Medico medico = medicoMapper.toEntity(dto);
+        medico.setUsuario(usuario);
+        Medico medicoSalvo = medicoRepository.save(medico);
+        return medicoMapper.toDTO(medicoSalvo);
     }
 
     @Transactional

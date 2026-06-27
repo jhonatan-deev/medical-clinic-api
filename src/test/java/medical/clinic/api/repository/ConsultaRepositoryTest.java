@@ -40,7 +40,6 @@ class ConsultaRepositoryTest {
 
         return new Medico(
                 "João Silva " + id,
-                "joao" + id + "@teste.com",
                 "CRM" + id,
                 String.valueOf(61990000000L + id),
                 Especialidade.CARDIOLOGIA,
@@ -54,7 +53,6 @@ class ConsultaRepositoryTest {
 
         return new Paciente(
                 "Maria Silva " + id,
-                "maria" + id + "@test.com",
                 String.valueOf(61993000000L + id),
                 "CPF" + id,
                 criarEndereco(),

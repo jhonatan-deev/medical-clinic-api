@@ -33,7 +33,7 @@ public class JwtService {
 
             return JWT.create()
                     .withIssuer("Medical Api")
-                    .withSubject(usuario.getLogin())
+                    .withSubject(usuario.getEmail())
                     .withExpiresAt(dataExpiracao())
                     .withClaim("id", usuario.getId())
                     .sign(algorithm);

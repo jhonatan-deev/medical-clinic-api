@@ -29,17 +29,17 @@ public class SecurityFilter extends OncePerRequestFilter {
         var tokenJWT = recuperarToken(request);
 
         if (tokenJWT != null) {
-            var login = jwtService.getSubject(tokenJWT); // ← Pega o email/login do token
+            var email = jwtService.getSubject(tokenJWT); // ← Pega o email/login do token
 
             // Busca o usuário no banco
-            var usuario = usuarioRepository.findByLogin(login)
+            var usuario = usuarioRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
             // CRIA A AUTENTICAÇÃO NO CONTEXTO DO SPRING
             var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            System.out.println("Usuário autenticado: " + login);
+            System.out.println("Usuário autenticado: " + email);
         }
 
         filterChain.doFilter(request, response);

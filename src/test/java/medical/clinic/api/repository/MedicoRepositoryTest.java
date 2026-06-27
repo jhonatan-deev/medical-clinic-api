@@ -41,7 +41,6 @@ class MedicoRepositoryTest {
 
         return new Medico(
                 "João Silva " + id,
-                "joao" + id + "@teste.com",
                 "CRM" + id,
                 String.valueOf(61990000000L + id),
                 Especialidade.CARDIOLOGIA,
@@ -55,7 +54,6 @@ class MedicoRepositoryTest {
 
         return new Medico(
                 "João Ocupado " + id,
-                "joao.ocupado" + id + "@teste.com",
                 "CRM-OCU" + id,
                 String.valueOf(61991000000L + id),
                 Especialidade.CARDIOLOGIA,
@@ -69,7 +67,6 @@ class MedicoRepositoryTest {
 
         return new Medico(
                 "Nome " + id,
-                "email" + id + "@test.com",
                 "CRM-ESP" + id,
                 String.valueOf(61992000000L + id),
                 esp,
@@ -83,7 +80,6 @@ class MedicoRepositoryTest {
 
         return new Paciente(
                 "Maria Silva " + id,
-                "maria" + id + "@test.com",
                 String.valueOf(61993000000L + id),
                 "CPF" + id,
                 criarEndereco(),

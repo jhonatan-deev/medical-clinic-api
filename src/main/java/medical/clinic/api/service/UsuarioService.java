@@ -1,0 +1,32 @@
+package medical.clinic.api.service;
+
+import medical.clinic.api.dto.usuario.UsuarioRequestDTO;
+import medical.clinic.api.exception.DuplicateResourceException;
+import medical.clinic.api.mapper.UsuarioMapper;
+import medical.clinic.api.model.Usuario;
+import medical.clinic.api.repository.UsuarioRepository;
+import org.springframework.stereotype.Service;
+
+@Service
+public class UsuarioService {
+
+    private final UsuarioRepository usuarioRepository;
+    private final UsuarioMapper usuarioMapper;
+
+    public UsuarioService(UsuarioRepository usuarioRepository,
+                          UsuarioMapper usuarioMapper) {
+        this.usuarioRepository = usuarioRepository;
+        this.usuarioMapper = usuarioMapper;
+    }
+
+    public Usuario criarUsuario(UsuarioRequestDTO dto) {
+
+        if (usuarioRepository.existsByEmail(dto.email())) {
+            throw new DuplicateResourceException("Email já cadastrado.");
+        }
+
+        Usuario usuario = usuarioMapper.toEntity(dto);
+
+        return usuarioRepository.save(usuario);
+    }
+}
