@@ -31,8 +31,8 @@ public class UsuarioMapper {
     }
 
     public void toUpdate(Usuario usuario, UsuarioUpdateDTO dto) {
-        if (dto.login() != null && !dto.login().isBlank()) {
-            usuario.setEmail(dto.login());
+        if (dto.email() != null && !dto.email().isBlank()) {
+            usuario.setEmail(dto.email());
         }
 
         if (dto.senha() != null && !dto.senha().isBlank()) {

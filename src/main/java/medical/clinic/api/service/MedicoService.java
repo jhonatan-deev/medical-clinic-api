@@ -29,6 +29,7 @@ public class MedicoService {
         this.usuarioRepository = usuarioRepository;
         this.usuarioService = usuarioService;
     }
+
     @Transactional
     public MedicoResponseDTO createDoctor(MedicoRequestDTO dto) {
         if (medicoRepository.existsByCrm(dto.crm())) {
@@ -37,8 +38,8 @@ public class MedicoService {
         Usuario usuario = usuarioService.criarUsuario(dto.usuario());
         Medico medico = medicoMapper.toEntity(dto);
         medico.setUsuario(usuario);
-        Medico medicoSalvo = medicoRepository.save(medico);
-        return medicoMapper.toDTO(medicoSalvo);
+        Medico salvo = medicoRepository.save(medico);
+        return medicoMapper.toDTO(salvo);
     }
 
     @Transactional

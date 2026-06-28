@@ -28,14 +28,15 @@ public class PacienteService {
 
     @Transactional
     public PacienteResponseDTO createPatient(PacienteRequestDTO dto) {
+
         if (pacienteRepository.existsByCpf(dto.cpf())) {
-            throw new DuplicateResourceException("CPF de usuário já existente.");
+            throw new DuplicateResourceException("CPF já existente.");
         }
         Usuario usuario = usuarioService.criarUsuario(dto.usuario());
         Paciente paciente = pacienteMapper.toEntity(dto);
         paciente.setUsuario(usuario);
-        Paciente pacienteSalvo = pacienteRepository.save(paciente);
-        return pacienteMapper.toDTO(pacienteSalvo);
+        Paciente salvo = pacienteRepository.save(paciente);
+        return pacienteMapper.toDTO(salvo);
     }
 
     @Transactional
