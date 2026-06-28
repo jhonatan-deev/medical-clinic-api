@@ -5,6 +5,7 @@ import medical.clinic.api.model.Consulta;
 import medical.clinic.api.model.Endereco;
 import medical.clinic.api.model.Medico;
 import medical.clinic.api.model.Paciente;
+import medical.clinic.api.model.Usuario;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 class ConsultaRepositoryTest {
+
     private static long contador = 1;
+
+    @Autowired
+    private ConsultaRepository consultaRepository;
+
+    @Autowired
+    private MedicoRepository medicoRepository;
+
+    @Autowired
+    private PacienteRepository pacienteRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     private Endereco criarEndereco() {
         return new Endereco(
@@ -35,10 +49,17 @@ class ConsultaRepositoryTest {
         );
     }
 
-    private Medico criarMedico(boolean ativo) {
-        long id = contador++;
+    private Usuario criarUsuario() {
+        Usuario usuario = new Usuario();
+        usuario.setEmail("teste" + contador++ + "@mail.com");
+        usuario.setSenha("123456");
+        return usuarioRepository.save(usuario);
+    }
 
-        return new Medico(
+    private Medico criarMedico(boolean ativo) {
+        Usuario usuario = criarUsuario();
+        long id = contador++;
+        Medico medico = new Medico(
                 "João Silva " + id,
                 "CRM" + id,
                 String.valueOf(61990000000L + id),
@@ -46,113 +67,85 @@ class ConsultaRepositoryTest {
                 criarEndereco(),
                 ativo
         );
+        medico.setUsuario(usuario);
+        return medicoRepository.save(medico);
     }
 
     private Paciente criarPaciente() {
+        Usuario usuario = criarUsuario();
         long id = contador++;
-
-        return new Paciente(
+        Paciente paciente = new Paciente(
                 "Maria Silva " + id,
                 String.valueOf(61993000000L + id),
                 "CPF" + id,
                 criarEndereco(),
                 true
         );
+        paciente.setUsuario(usuario);
+        return pacienteRepository.save(paciente);
     }
-
-    @Autowired
-    private ConsultaRepository consultaRepository;
-    @Autowired
-    private MedicoRepository medicoRepository;
-    @Autowired
-    private PacienteRepository pacienteRepository;
 
     @Test
     @DisplayName("Deve retornar true quando paciente possui consulta no período")
     void deveRetornarTrueQuandoPacientePossuiConsultaNoPeriodo() {
-
-        // ARRANGE
         LocalDateTime dataConsulta = LocalDateTime.of(2026, 6, 20, 10, 0);
         LocalDateTime dataConsultaFinal = LocalDateTime.of(2026, 6, 20, 11, 0);
         Paciente paciente = criarPaciente();
         Medico medico = criarMedico(true);
         Consulta criarConsulta = new Consulta(medico, paciente, dataConsulta);
-        medicoRepository.save(medico);
-        pacienteRepository.save(paciente);
         consultaRepository.save(criarConsulta);
-        // ACT
-        boolean consultas = consultaRepository.existsByPacienteIdAndDataBetween(paciente.getId(),dataConsulta, dataConsultaFinal );
 
-        // ASSERT
+        boolean consultas = consultaRepository.existsByPacienteIdAndDataBetween(
+                paciente.getId(), dataConsulta, dataConsultaFinal);
+
         assertTrue(consultas);
     }
 
     @Test
     @DisplayName("Deve retornar false quando paciente não possui consulta no período")
     void deveRetornarFalseQuandoPacienteNaoPossuiConsultaNoPeriodo() {
-
-        // ARRANGE
         LocalDateTime dataConsulta = LocalDateTime.of(2026, 6, 20, 10, 0);
         LocalDateTime dataConsultaFinal = LocalDateTime.of(2026, 6, 20, 11, 0);
-        LocalDateTime consultaForaDoPeriodos = LocalDateTime.of(2026, 6, 20, 15, 30);
+        LocalDateTime consultaForaDoPeriodo = LocalDateTime.of(2026, 6, 20, 15, 30);
         Paciente paciente = criarPaciente();
         Medico medico = criarMedico(true);
         Consulta criarConsulta = new Consulta(medico, paciente, dataConsulta);
-
-        medicoRepository.save(medico);
-        pacienteRepository.save(paciente);
         consultaRepository.save(criarConsulta);
-        // ACT
-        boolean pacienteExiste = consultaRepository.existsByPacienteIdAndDataBetween(paciente.getId(), dataConsultaFinal,consultaForaDoPeriodos);
 
-        // ASSERT
+        boolean pacienteExiste = consultaRepository.existsByPacienteIdAndDataBetween(
+                paciente.getId(), dataConsultaFinal, consultaForaDoPeriodo);
+
         assertFalse(pacienteExiste);
     }
 
     @Test
     @DisplayName("Deve retornar true quando médico possui consulta no horário")
     void deveRetornarTrueQuandoMedicoPossuiConsultaNoHorario() {
-        // ARRANGE
         LocalDateTime dataConsulta = LocalDateTime.of(2026, 6, 20, 10, 0);
         Medico medico = criarMedico(true);
         Paciente paciente = criarPaciente();
-
         Consulta criarConsulta = new Consulta(medico, paciente, dataConsulta);
-
-        medicoRepository.save(medico);
-        pacienteRepository.save(paciente);
         consultaRepository.save(criarConsulta);
-        // ACT
-        boolean medicoExiste =
-                consultaRepository.existsByMedicoIdAndData(
-                        medico.getId(),
-                        dataConsulta
-                );
 
-        // ASSERT
+        boolean medicoExiste = consultaRepository.existsByMedicoIdAndData(
+                medico.getId(), dataConsulta);
+
         assertTrue(medicoExiste);
     }
 
     @Test
     @DisplayName("Deve retornar false quando médico não possui consulta no horário")
     void deveRetornarFalseQuandoMedicoNaoPossuiConsultaNoHorario() {
-
-        // ARRANGE
         LocalDateTime dataConsultaPesquisada = LocalDateTime.of(2026, 6, 20, 10, 0);
-        LocalDateTime dataConsultaDiferenteDoPesquisado = LocalDateTime.of(2026, 6, 20, 14, 0);
+        LocalDateTime dataConsultaDiferente = LocalDateTime.of(2026, 6, 20, 14, 0);
         Medico medico = criarMedico(true);
         Paciente paciente = criarPaciente();
-        Consulta criarConsulta = new Consulta(medico, paciente, dataConsultaDiferenteDoPesquisado);
-        medicoRepository.save(medico);
-        pacienteRepository.save(paciente);
+        Consulta criarConsulta = new Consulta(medico, paciente, dataConsultaDiferente);
         consultaRepository.save(criarConsulta);
 
-        // ACT
-        boolean consultas = consultaRepository.existsByMedicoIdAndData(medico.getId(), dataConsultaPesquisada);
+        boolean consultas = consultaRepository.existsByMedicoIdAndData(
+                medico.getId(), dataConsultaPesquisada);
 
-        // ASSERT
         assertFalse(consultas);
     }
-
-
 }

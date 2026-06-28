@@ -1,13 +1,15 @@
 package medical.clinic.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import medical.clinic.api.dto.consulta.ConsultaRequestDTO;;
+import medical.clinic.api.dto.consulta.ConsultaRequestDTO;
 import medical.clinic.api.enuns.Especialidade;
 import medical.clinic.api.model.Endereco;
 import medical.clinic.api.model.Medico;
 import medical.clinic.api.model.Paciente;
+import medical.clinic.api.model.Usuario;
 import medical.clinic.api.repository.MedicoRepository;
 import medical.clinic.api.repository.PacienteRepository;
+import medical.clinic.api.repository.UsuarioRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -27,8 +30,26 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Transactional
 class ConsultaControllerTest {
+
     private static long contador = 1;
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private MedicoRepository medicoRepository;
+
+    @Autowired
+    private PacienteRepository pacienteRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     private Endereco criarEndereco() {
         return new Endereco(
                 "Rua A",
@@ -41,61 +62,72 @@ class ConsultaControllerTest {
         );
     }
 
-    private Medico criarMedico(boolean ativo) {
-        long id = contador++;
+    private Usuario criarUsuario() {
+        Usuario usuario = new Usuario();
+        usuario.setEmail("teste" + contador++ + "@mail.com");
+        usuario.setSenha("123456");
 
-        return new Medico(
-                "João Silva " + id,
-                "CRM" + id,
-                String.valueOf(61990000000L + id),
+        usuario = usuarioRepository.saveAndFlush(usuario);
+
+        return usuarioRepository.findById(usuario.getId())
+                .orElseThrow();
+    }
+
+    private Medico criarMedico(boolean ativo) {
+
+        Usuario usuario = criarUsuario();
+
+        Medico medico = new Medico(
+                "João Silva " + contador,
+                "CRM" + contador++,
+                String.valueOf(61990000000L + contador),
                 Especialidade.CARDIOLOGIA,
                 criarEndereco(),
                 ativo
         );
+
+        medico.setUsuario(usuario);
+
+        return medicoRepository.save(medico);
     }
 
     private Paciente criarPaciente() {
-        long id = contador++;
 
-        return new Paciente(
-                "Maria Silva " + id,
-                String.valueOf(61993000000L + id),
-                "CPF" + id,
+        Usuario usuario = criarUsuario();
+
+        Paciente paciente = new Paciente(
+                "Maria Silva " + contador,
+                String.valueOf(61993000000L + contador),
+                "CPF" + contador++,
                 criarEndereco(),
                 true
         );
+
+        paciente.setUsuario(usuario);
+
+        return pacienteRepository.save(paciente);
     }
 
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    private MedicoRepository medicoRepository;
-    @Autowired
-    private PacienteRepository pacienteRepository;
-
-
     @Test
-    @DisplayName("Deve devolver codigo http 400 quando informacaoes estão invalidas")
+    @DisplayName("Deve retornar 400 quando informações estiverem inválidas")
     @WithMockUser
     void agendar_cenario1() throws Exception {
-        var response = mockMvc.perform(post("/api/v1/consultas")).andReturn().getResponse();
 
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        var response = mockMvc.perform(post("/api/v1/consultas"))
+                .andReturn()
+                .getResponse();
+
+        assertThat(response.getStatus())
+                .isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
-    @DisplayName("Deve devolver código http 201 quando informações estão válidas")
+    @DisplayName("Deve retornar 201 quando informações estiverem válidas")
     @WithMockUser
     void agendar_cenario2() throws Exception {
 
-        // ARRANGE
         Medico medico = criarMedico(true);
         Paciente paciente = criarPaciente();
-
-        medicoRepository.save(medico);
-        pacienteRepository.save(paciente);
 
         LocalDateTime dataConsulta = LocalDateTime.now()
                 .plusDays(1)
@@ -111,7 +143,6 @@ class ConsultaControllerTest {
                 Especialidade.ORTOPEDIA
         );
 
-        // ACT
         var response = mockMvc.perform(
                         post("/api/v1/consultas")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -120,13 +151,12 @@ class ConsultaControllerTest {
                 .andReturn()
                 .getResponse();
 
-        // ASSERT
         assertThat(response.getStatus())
                 .isEqualTo(HttpStatus.CREATED.value());
 
-        String jsonRetornado = response.getContentAsString();
+        String json = response.getContentAsString();
 
-        assertThat(jsonRetornado).contains(String.valueOf(medico.getId()));
-        assertThat(jsonRetornado).contains(String.valueOf(paciente.getId()));
+        assertThat(json).contains(String.valueOf(medico.getId()));
+        assertThat(json).contains(String.valueOf(paciente.getId()));
     }
 }

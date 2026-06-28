@@ -5,6 +5,7 @@ import medical.clinic.api.model.Consulta;
 import medical.clinic.api.model.Endereco;
 import medical.clinic.api.model.Medico;
 import medical.clinic.api.model.Paciente;
+import medical.clinic.api.model.Usuario;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,18 @@ class MedicoRepositoryTest {
 
     private static long contador = 1;
 
+    @Autowired
+    private MedicoRepository medicoRepository;
+
+    @Autowired
+    private PacienteRepository pacienteRepository;
+
+    @Autowired
+    private ConsultaRepository consultaRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     private Endereco criarEndereco() {
         return new Endereco(
                 "Rua A",
@@ -36,10 +49,17 @@ class MedicoRepositoryTest {
         );
     }
 
-    private Medico criarMedico(boolean ativo) {
-        long id = contador++;
+    private Usuario criarUsuario() {
+        Usuario usuario = new Usuario();
+        usuario.setEmail("teste" + contador++ + "@mail.com");
+        usuario.setSenha("123456");
+        return usuarioRepository.save(usuario);
+    }
 
-        return new Medico(
+    private Medico criarMedico(boolean ativo) {
+        Usuario usuario = criarUsuario();
+        long id = contador++;
+        Medico medico = new Medico(
                 "João Silva " + id,
                 "CRM" + id,
                 String.valueOf(61990000000L + id),
@@ -47,12 +67,14 @@ class MedicoRepositoryTest {
                 criarEndereco(),
                 ativo
         );
+        medico.setUsuario(usuario);
+        return medicoRepository.save(medico);
     }
 
     private Medico criarMedicoOcupado(boolean ativo) {
+        Usuario usuario = criarUsuario();
         long id = contador++;
-
-        return new Medico(
+        Medico medico = new Medico(
                 "João Ocupado " + id,
                 "CRM-OCU" + id,
                 String.valueOf(61991000000L + id),
@@ -60,12 +82,14 @@ class MedicoRepositoryTest {
                 criarEndereco(),
                 ativo
         );
+        medico.setUsuario(usuario);
+        return medicoRepository.save(medico);
     }
 
     private Medico criarMedicoComEspecialidade(Especialidade esp) {
+        Usuario usuario = criarUsuario();
         long id = contador++;
-
-        return new Medico(
+        Medico medico = new Medico(
                 "Nome " + id,
                 "CRM-ESP" + id,
                 String.valueOf(61992000000L + id),
@@ -73,27 +97,23 @@ class MedicoRepositoryTest {
                 criarEndereco(),
                 true
         );
+        medico.setUsuario(usuario);
+        return medicoRepository.save(medico);
     }
 
     private Paciente criarPaciente() {
+        Usuario usuario = criarUsuario();
         long id = contador++;
-
-        return new Paciente(
+        Paciente paciente = new Paciente(
                 "Maria Silva " + id,
                 String.valueOf(61993000000L + id),
                 "CPF" + id,
                 criarEndereco(),
                 true
         );
+        paciente.setUsuario(usuario);
+        return pacienteRepository.save(paciente);
     }
-    @Autowired
-    private MedicoRepository medicoRepository;
-
-    @Autowired
-    private PacienteRepository pacienteRepository;
-
-    @Autowired
-    private ConsultaRepository consultaRepository;
 
     @Test
     @DisplayName("Deve retornar médicos ativos e disponíveis na data informada")
@@ -103,7 +123,6 @@ class MedicoRepositoryTest {
         Medico medico = criarMedico(true);
 
         // ACT
-        medicoRepository.save(medico);
         List<Medico> resultado = medicoRepository.findMedicosAtivosDisponiveisNaData(dataConsulta);
 
         // ASSERT
@@ -119,7 +138,6 @@ class MedicoRepositoryTest {
         Medico medico = criarMedico(false);
 
         // ACT
-        medicoRepository.save(medico);
         List<Medico> resultado = medicoRepository.findMedicosAtivosDisponiveisNaData(dataConsulta);
 
         // ASSERT
@@ -135,8 +153,6 @@ class MedicoRepositoryTest {
         Paciente paciente = criarPaciente();
 
         // ACT
-        medicoRepository.save(medico);
-        pacienteRepository.save(paciente);
         consultaRepository.save(new Consulta(medico, paciente, dataConsulta));
 
         List<Medico> resultado = medicoRepository.findMedicosAtivosDisponiveisNaData(dataConsulta);
@@ -156,8 +172,6 @@ class MedicoRepositoryTest {
         Paciente paciente = criarPaciente();
 
         // ACT
-        medicoRepository.save(medico);
-        pacienteRepository.save(paciente);
         consultaRepository.save(new Consulta(medico, paciente, outroHorario));
 
         List<Medico> resultado = medicoRepository.findMedicosAtivosDisponiveisNaData(dataConsulta);
@@ -178,9 +192,6 @@ class MedicoRepositoryTest {
         Paciente paciente = criarPaciente();
 
         // ACT
-        medicoRepository.save(livre);
-        medicoRepository.save(ocupado);
-        pacienteRepository.save(paciente);
         consultaRepository.save(new Consulta(ocupado, paciente, dataConsulta));
 
         List<Medico> resultado = medicoRepository.findMedicosAtivosDisponiveisNaData(dataConsulta);
@@ -201,9 +212,6 @@ class MedicoRepositoryTest {
         Medico ortopedista = criarMedicoComEspecialidade(Especialidade.ORTOPEDIA);
 
         // ACT
-        medicoRepository.save(cardio);
-        medicoRepository.save(ortopedista);
-
         List<Medico> resultado =
                 medicoRepository.findMedicosAtivosDisponiveisNaDataPorEspecialidade(
                         dataConsulta,
@@ -219,7 +227,6 @@ class MedicoRepositoryTest {
     @Test
     @DisplayName("Deve retornar médico apenas se não houver consulta no horário exato")
     void deveRetornarMedicoApenasSeNaoHouverConsultaNoHorarioExato() {
-
         // ARRANGE
         LocalDateTime dataConsulta = LocalDateTime.of(2026, 6, 20, 10, 0);
         LocalDateTime outroHorario = LocalDateTime.of(2026, 6, 20, 12, 0);
@@ -227,10 +234,6 @@ class MedicoRepositoryTest {
         Medico medico = criarMedico(true);
         Paciente paciente1 = criarPaciente();
         Paciente paciente2 = criarPaciente();
-
-        medicoRepository.save(medico);
-        pacienteRepository.save(paciente1);
-        pacienteRepository.save(paciente2);
 
         consultaRepository.save(new Consulta(medico, paciente1, dataConsulta));
         consultaRepository.save(new Consulta(medico, paciente2, outroHorario));
@@ -246,15 +249,11 @@ class MedicoRepositoryTest {
     @Test
     @DisplayName("Não deve retornar médico da especialidade quando estiver ocupado no horário")
     void naoDeveRetornarMedicoDaEspecialidadeQuandoEstiverOcupadoNoHorario() {
-
         // ARRANGE
         LocalDateTime dataConsulta = LocalDateTime.of(2026, 6, 20, 10, 0);
 
         Medico cardio = criarMedicoComEspecialidade(Especialidade.CARDIOLOGIA);
         Paciente paciente = criarPaciente();
-
-        medicoRepository.save(cardio);
-        pacienteRepository.save(paciente);
 
         consultaRepository.save(
                 new Consulta(cardio, paciente, dataConsulta)
@@ -266,5 +265,4 @@ class MedicoRepositoryTest {
         // ASSERT
         assertTrue(resultado.isEmpty());
     }
-
 }

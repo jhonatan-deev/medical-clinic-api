@@ -1,23 +1,16 @@
 package medical.clinic.api.dto.paciente;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import medical.clinic.api.dto.endereco.EnderecoDTO;
 import medical.clinic.api.dto.usuario.UsuarioRequestDTO;
-import medical.clinic.api.model.Usuario;
-
 
 public record PacienteRequestDTO(
 
         @NotBlank(message = "Nome é obrigatório")
         String nome,
-
-        @NotBlank(message = "Email é obrigatório")
-        @Email(message = "Email inválido")
-        String email,
 
         @NotBlank(message = "Telefone é obrigatório")
         @Pattern(
@@ -38,6 +31,6 @@ public record PacienteRequestDTO(
         EnderecoDTO endereco,
 
         @Valid
-        @NotNull
+        @NotNull(message = "Usuário é obrigatório")
         UsuarioRequestDTO usuario
 ) {}
