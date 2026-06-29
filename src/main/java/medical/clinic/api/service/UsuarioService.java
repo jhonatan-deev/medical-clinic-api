@@ -2,6 +2,7 @@ package medical.clinic.api.service;
 
 import jakarta.transaction.Transactional;
 import medical.clinic.api.dto.usuario.UsuarioRequestDTO;
+import medical.clinic.api.enuns.Perfil;
 import medical.clinic.api.exception.DuplicateResourceException;
 import medical.clinic.api.mapper.UsuarioMapper;
 import medical.clinic.api.model.Usuario;
@@ -21,11 +22,12 @@ public class UsuarioService {
     }
 
     @Transactional
-    public Usuario criarUsuario(UsuarioRequestDTO dto) {
+    public Usuario criarUsuario(UsuarioRequestDTO dto, Perfil perfil) {
         if (usuarioRepository.existsByEmail(dto.email())) {
             throw new DuplicateResourceException("Email já cadastrado.");
         }
-        Usuario usuario = usuarioMapper.toEntity(dto);
+
+        Usuario usuario = usuarioMapper.toEntity(dto, perfil);
         return usuarioRepository.save(usuario);
     }
 }

@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import medical.clinic.api.dto.paciente.PacienteRequestDTO;
 import medical.clinic.api.dto.paciente.PacienteResponseDTO;
 import medical.clinic.api.dto.paciente.PacienteUpdateDTO;
+import medical.clinic.api.enuns.Perfil;
 import medical.clinic.api.exception.DuplicateResourceException;
 import medical.clinic.api.exception.PacienteNotFoundException;
 import medical.clinic.api.mapper.PacienteMapper;
@@ -32,7 +33,7 @@ public class PacienteService {
         if (pacienteRepository.existsByCpf(dto.cpf())) {
             throw new DuplicateResourceException("CPF já existente.");
         }
-        Usuario usuario = usuarioService.criarUsuario(dto.usuario());
+        Usuario usuario = usuarioService.criarUsuario(dto.usuario(), Perfil.PACIENTE);
         Paciente paciente = pacienteMapper.toEntity(dto);
         paciente.setUsuario(usuario);
         Paciente salvo = pacienteRepository.save(paciente);

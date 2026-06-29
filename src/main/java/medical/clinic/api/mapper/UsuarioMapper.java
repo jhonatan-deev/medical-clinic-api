@@ -3,6 +3,7 @@ package medical.clinic.api.mapper;
 import medical.clinic.api.dto.usuario.UsuarioRequestDTO;
 import medical.clinic.api.dto.usuario.UsuarioResponseDTO;
 import medical.clinic.api.dto.usuario.UsuarioUpdateDTO;
+import medical.clinic.api.enuns.Perfil;
 import medical.clinic.api.model.Usuario;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -16,17 +17,19 @@ public class UsuarioMapper {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Usuario toEntity(UsuarioRequestDTO dto) {
+    public Usuario toEntity(UsuarioRequestDTO dto, Perfil perfil) {
         Usuario usuario = new Usuario();
         usuario.setEmail(dto.email());
         usuario.setSenha(passwordEncoder.encode(dto.senha()));
+        usuario.setPerfil(perfil);
         return usuario;
     }
 
     public UsuarioResponseDTO toDTO(Usuario usuario) {
         return new UsuarioResponseDTO(
                 usuario.getId(),
-                usuario.getEmail()
+                usuario.getEmail(),
+                usuario.getPerfil()
         );
     }
 
