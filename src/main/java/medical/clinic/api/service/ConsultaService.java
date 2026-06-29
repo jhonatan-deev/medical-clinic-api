@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import medical.clinic.api.dto.consulta.CancelamentoRequestDTO;
 import medical.clinic.api.dto.consulta.ConsultaRequestDTO;
 import medical.clinic.api.dto.consulta.ConsultaResponseDTO;
+import medical.clinic.api.dto.consulta.ConsultaUpdateDTO;
 import medical.clinic.api.exception.ConsultaNotFoundException;
 import medical.clinic.api.exception.MedicoNotFoundException;
 import medical.clinic.api.exception.PacienteNotFoundException;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
@@ -34,12 +36,7 @@ public class ConsultaService {
     private final List<ValidadorAgendamentoConsulta> validadores;
     private final List<ValidadorCancelamentoConsulta> validadoresCancelamento;
 
-    public ConsultaService(ConsultaRepository consultaRepository,
-                           MedicoRepository medicoRepository,
-                           PacienteRepository pacienteRepository,
-                           ConsultaMapper consultaMapper,
-                           List<ValidadorAgendamentoConsulta> validadores,
-                           List<ValidadorCancelamentoConsulta> validadoresCancelamento) {
+    public ConsultaService(ConsultaRepository consultaRepository, MedicoRepository medicoRepository, PacienteRepository pacienteRepository, ConsultaMapper consultaMapper, List<ValidadorAgendamentoConsulta> validadores, List<ValidadorCancelamentoConsulta> validadoresCancelamento) {
         this.consultaRepository = consultaRepository;
         this.medicoRepository = medicoRepository;
         this.pacienteRepository = pacienteRepository;
@@ -78,6 +75,23 @@ public class ConsultaService {
 
         Consulta consultaCancelada = consultaRepository.save(consulta);
         return consultaMapper.toDTO(consultaCancelada);
+    }
+
+    @Transactional
+    public ConsultaResponseDTO editConsultation(Long consultaId, ConsultaUpdateDTO dto) {
+        Consulta consulta = consultaRepository.findById(consultaId)
+                .orElseThrow(() -> new ConsultaNotFoundException("Consulta não encontrada!"));
+        Medico medico = medicoRepository.findById(dto.medicoId())
+                .orElseThrow(() -> new MedicoNotFoundException("Médico não encontrado!"));
+        boolean existeConflito = consultaRepository.existsByMedicoIdAndDataAndIdNot(medico.getId(), dto.data(), consultaId);
+        if (existeConflito) {
+            throw new IllegalArgumentException("Já existe uma consulta com esse médico nesse horário.");
+        }
+
+        consulta.setMedico(medico);
+        consulta.setData(dto.data());
+        Consulta consultaAtualizada = consultaRepository.save(consulta);
+        return consultaMapper.toDTO(consultaAtualizada);
     }
 
     public Page<ConsultaResponseDTO> listConsultations(Pageable pageable) {

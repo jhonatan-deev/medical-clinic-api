@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import medical.clinic.api.dto.consulta.CancelamentoRequestDTO;
 import medical.clinic.api.dto.consulta.ConsultaRequestDTO;
 import medical.clinic.api.dto.consulta.ConsultaResponseDTO;
+import medical.clinic.api.dto.consulta.ConsultaUpdateDTO;
 import medical.clinic.api.service.ConsultaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +35,13 @@ public class ConsultaController {
     public ResponseEntity<ConsultaResponseDTO> cancelConsultation(@RequestBody @Valid CancelamentoRequestDTO dto) {
         ConsultaResponseDTO consultaCancelada = consultaService.cancelConsultation(dto);
         return ResponseEntity.status(HttpStatus.OK).body(consultaCancelada);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ConsultaResponseDTO> updateConsultation(@RequestBody @Valid ConsultaUpdateDTO dto, @PathVariable Long id) {
+        ConsultaResponseDTO consultaAtualizada = consultaService.editConsultation(id, dto);
+        return ResponseEntity.status(HttpStatus.OK).body(consultaAtualizada);
+
     }
 
     @GetMapping
