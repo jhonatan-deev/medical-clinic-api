@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import medical.clinic.api.dto.medico.MedicoRequestDTO;
 import medical.clinic.api.dto.medico.MedicoResponseDTO;
 import medical.clinic.api.dto.medico.MedicoUpdateDTO;
+import medical.clinic.api.enuns.Perfil;
 import medical.clinic.api.exception.DuplicateResourceException;
 import medical.clinic.api.exception.MedicoNotFoundException;
 import medical.clinic.api.mapper.MedicoMapper;
@@ -20,13 +21,11 @@ import org.springframework.stereotype.Service;
 public class MedicoService {
     private final MedicoRepository medicoRepository;
     private final MedicoMapper medicoMapper;
-    private final UsuarioRepository usuarioRepository;
     private final UsuarioService usuarioService;
 
-    public MedicoService(MedicoRepository medicoRepository, MedicoMapper medicoMapper, UsuarioRepository usuarioRepository, UsuarioService usuarioService) {
+    public MedicoService(MedicoRepository medicoRepository, MedicoMapper medicoMapper, UsuarioService usuarioService) {
         this.medicoRepository = medicoRepository;
         this.medicoMapper = medicoMapper;
-        this.usuarioRepository = usuarioRepository;
         this.usuarioService = usuarioService;
     }
 
@@ -35,7 +34,10 @@ public class MedicoService {
         if (medicoRepository.existsByCrm(dto.crm())) {
             throw new DuplicateResourceException("CRM já cadastrado.");
         }
-        Usuario usuario = usuarioService.criarUsuario(dto.usuario());
+        Usuario usuario = usuarioService.criarUsuario(
+                dto.usuario(),
+                Perfil.MEDICO
+        );
         Medico medico = medicoMapper.toEntity(dto);
         medico.setUsuario(usuario);
         Medico salvo = medicoRepository.save(medico);

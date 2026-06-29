@@ -1,6 +1,7 @@
 package medical.clinic.api.repository;
 
 import medical.clinic.api.enuns.Especialidade;
+import medical.clinic.api.enuns.Perfil;
 import medical.clinic.api.model.Consulta;
 import medical.clinic.api.model.Endereco;
 import medical.clinic.api.model.Medico;
@@ -49,15 +50,16 @@ class MedicoRepositoryTest {
         );
     }
 
-    private Usuario criarUsuario() {
+    private Usuario criarUsuario(Perfil perfil) {
         Usuario usuario = new Usuario();
         usuario.setEmail("teste" + contador++ + "@mail.com");
         usuario.setSenha("123456");
+        usuario.setPerfil(perfil);
         return usuarioRepository.save(usuario);
     }
 
     private Medico criarMedico(boolean ativo) {
-        Usuario usuario = criarUsuario();
+        Usuario usuario = criarUsuario(Perfil.MEDICO);
         long id = contador++;
         Medico medico = new Medico(
                 "João Silva " + id,
@@ -72,7 +74,7 @@ class MedicoRepositoryTest {
     }
 
     private Medico criarMedicoOcupado(boolean ativo) {
-        Usuario usuario = criarUsuario();
+        Usuario usuario = criarUsuario(Perfil.MEDICO);
         long id = contador++;
         Medico medico = new Medico(
                 "João Ocupado " + id,
@@ -87,7 +89,7 @@ class MedicoRepositoryTest {
     }
 
     private Medico criarMedicoComEspecialidade(Especialidade esp) {
-        Usuario usuario = criarUsuario();
+        Usuario usuario = criarUsuario(Perfil.MEDICO);
         long id = contador++;
         Medico medico = new Medico(
                 "Nome " + id,
@@ -102,7 +104,7 @@ class MedicoRepositoryTest {
     }
 
     private Paciente criarPaciente() {
-        Usuario usuario = criarUsuario();
+        Usuario usuario = criarUsuario(Perfil.PACIENTE);
         long id = contador++;
         Paciente paciente = new Paciente(
                 "Maria Silva " + id,

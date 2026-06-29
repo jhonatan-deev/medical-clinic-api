@@ -3,6 +3,7 @@ package medical.clinic.api.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import medical.clinic.api.dto.consulta.ConsultaRequestDTO;
 import medical.clinic.api.enuns.Especialidade;
+import medical.clinic.api.enuns.Perfil;
 import medical.clinic.api.model.Endereco;
 import medical.clinic.api.model.Medico;
 import medical.clinic.api.model.Paciente;
@@ -62,10 +63,11 @@ class ConsultaControllerTest {
         );
     }
 
-    private Usuario criarUsuario() {
+    private Usuario criarUsuario(Perfil perfil) {
         Usuario usuario = new Usuario();
         usuario.setEmail("teste" + contador++ + "@mail.com");
         usuario.setSenha("123456");
+        usuario.setPerfil(perfil);
 
         usuario = usuarioRepository.saveAndFlush(usuario);
 
@@ -74,8 +76,7 @@ class ConsultaControllerTest {
     }
 
     private Medico criarMedico(boolean ativo) {
-
-        Usuario usuario = criarUsuario();
+        Usuario usuario = criarUsuario(Perfil.MEDICO);
 
         Medico medico = new Medico(
                 "João Silva " + contador,
@@ -92,8 +93,7 @@ class ConsultaControllerTest {
     }
 
     private Paciente criarPaciente() {
-
-        Usuario usuario = criarUsuario();
+        Usuario usuario = criarUsuario(Perfil.PACIENTE);
 
         Paciente paciente = new Paciente(
                 "Maria Silva " + contador,
@@ -112,7 +112,6 @@ class ConsultaControllerTest {
     @DisplayName("Deve retornar 400 quando informações estiverem inválidas")
     @WithMockUser
     void agendar_cenario1() throws Exception {
-
         var response = mockMvc.perform(post("/api/v1/consultas"))
                 .andReturn()
                 .getResponse();
@@ -125,7 +124,6 @@ class ConsultaControllerTest {
     @DisplayName("Deve retornar 201 quando informações estiverem válidas")
     @WithMockUser
     void agendar_cenario2() throws Exception {
-
         Medico medico = criarMedico(true);
         Paciente paciente = criarPaciente();
 

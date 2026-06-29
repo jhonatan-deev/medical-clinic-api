@@ -2,6 +2,7 @@ package medical.clinic.api.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import medical.clinic.api.enuns.Perfil;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,12 +29,18 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String senha;
 
-    public Usuario(String email, String senha) {
+    @Setter
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Perfil perfil;
+
+    public Usuario(String email, String senha, Perfil perfil) {
         validarEmail(email);
         validarSenha(senha);
 
         this.email = email;
         this.senha = senha;
+        this.perfil = perfil;
     }
 
     private void validarEmail(String email) {
@@ -50,7 +57,9 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return List.of(
+                new SimpleGrantedAuthority("ROLE_" + perfil.name())
+        );
     }
 
     @Override public String getPassword() { return senha; }
