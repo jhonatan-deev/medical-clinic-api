@@ -26,41 +26,40 @@ public class SecurityConfigurations {
 
         return http.csrf(csrf -> csrf.disable()).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).authorizeHttpRequests(auth -> auth
 
-                // Públicas
-                .requestMatchers("/", "/api/v1/auth/login", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        // Públicas
+                        .requestMatchers("/", "/api/v1/auth/login", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
-                // Médicos
-                .requestMatchers(HttpMethod.GET, "/api/v1/medicos/**").hasAnyRole("ADMIN", "ATENDENTE", "MEDICO")
+                        // Médicos
+                        .requestMatchers(HttpMethod.GET, "/api/v1/medicos/**").hasAnyRole("PACIENTE", "ATENDENTE")
 
-                .requestMatchers(HttpMethod.POST, "/api/v1/medicos/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/medicos/**").hasRole("ATENDENTE")
 
-                .requestMatchers(HttpMethod.PUT, "/api/v1/medicos/**").hasAnyRole("ADMIN", "MEDICO")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/medicos/**").hasRole("ATENDENTE")
 
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/medicos/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/medicos/**").hasRole("ATENDENTE")
 
+                        // Pacientes
+                        .requestMatchers(HttpMethod.GET, "/api/v1/pacientes/**").hasRole("ATENDENTE")
 
-                // Pacientes
-                .requestMatchers(HttpMethod.GET, "/api/v1/pacientes/**").hasAnyRole("ADMIN", "ATENDENTE", "PACIENTE")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/pacientes/**").hasRole("ATENDENTE")
 
-                .requestMatchers(HttpMethod.POST, "/api/v1/pacientes/**").hasAnyRole("ADMIN", "ATENDENTE")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/pacientes/**").hasRole("ATENDENTE")
 
-                .requestMatchers(HttpMethod.PUT, "/api/v1/pacientes/**").hasAnyRole("ADMIN", "ATENDENTE", "PACIENTE")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/pacientes/**").hasRole("ATENDENTE")
 
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/pacientes/**").hasAnyRole("ADMIN", "ATENDENTE")
+                        // Consultas
+                        .requestMatchers(HttpMethod.GET, "/api/v1/consultas/**").hasAnyRole("MEDICO", "PACIENTE", "ATENDENTE")
 
+                        .requestMatchers(HttpMethod.POST, "/api/v1/consultas/**").hasAnyRole("PACIENTE", "ATENDENTE")
 
-                // Consultas
-                .requestMatchers(HttpMethod.GET, "/api/v1/consultas/**").hasAnyRole("ADMIN", "ATENDENTE", "MEDICO", "PACIENTE")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/consultas/**").hasAnyRole("PACIENTE", "ATENDENTE")
 
-                .requestMatchers(HttpMethod.PUT, "/api/v1/consultas/**").hasAnyRole("ADMIN", "ATENDENTE", "MEDICO")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/consultas/**").hasAnyRole("MEDICO", "PACIENTE", "ATENDENTE")
 
-                .requestMatchers(HttpMethod.POST, "/api/v1/consultas").hasAnyRole("ADMIN", "ATENDENTE")
+                        // Qualquer outra rota precisa estar autenticada
+                        .anyRequest().authenticated())
 
-                .requestMatchers(HttpMethod.POST, "/api/v1/consultas/cancelar").hasAnyRole("ADMIN", "ATENDENTE", "MEDICO")
-
-
-                // Qualquer outra rota precisa estar autenticada
-                .anyRequest().authenticated()).addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
     }
 
     @Bean

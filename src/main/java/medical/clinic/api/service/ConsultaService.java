@@ -8,6 +8,7 @@ import medical.clinic.api.dto.consulta.ConsultaUpdateDTO;
 import medical.clinic.api.exception.ConsultaNotFoundException;
 import medical.clinic.api.exception.MedicoNotFoundException;
 import medical.clinic.api.exception.PacienteNotFoundException;
+import medical.clinic.api.exception.RegraNegocioException;
 import medical.clinic.api.mapper.ConsultaMapper;
 import medical.clinic.api.model.Consulta;
 import medical.clinic.api.model.Medico;
@@ -16,6 +17,7 @@ import medical.clinic.api.repository.ConsultaRepository;
 import medical.clinic.api.repository.MedicoRepository;
 import medical.clinic.api.repository.PacienteRepository;
 import medical.clinic.api.validation.agendamento.ValidadorAgendamentoConsulta;
+import medical.clinic.api.validation.atualizacao.ValidadorAtualizacaoConsulta;
 import medical.clinic.api.validation.cancelamento.ValidadorCancelamentoConsulta;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -35,14 +37,22 @@ public class ConsultaService {
     private final ConsultaMapper consultaMapper;
     private final List<ValidadorAgendamentoConsulta> validadores;
     private final List<ValidadorCancelamentoConsulta> validadoresCancelamento;
+    private final ValidadorAtualizacaoConsulta validadorAtualizacaoConsulta;
 
-    public ConsultaService(ConsultaRepository consultaRepository, MedicoRepository medicoRepository, PacienteRepository pacienteRepository, ConsultaMapper consultaMapper, List<ValidadorAgendamentoConsulta> validadores, List<ValidadorCancelamentoConsulta> validadoresCancelamento) {
+
+    public ConsultaService(ConsultaRepository consultaRepository,
+                           MedicoRepository medicoRepository,
+                           PacienteRepository pacienteRepository,
+                           ConsultaMapper consultaMapper,
+                           List<ValidadorAgendamentoConsulta> validadores,
+                           List<ValidadorCancelamentoConsulta> validadoresCancelamento, ValidadorAtualizacaoConsulta validadorAtualizacaoConsulta) {
         this.consultaRepository = consultaRepository;
         this.medicoRepository = medicoRepository;
         this.pacienteRepository = pacienteRepository;
         this.consultaMapper = consultaMapper;
         this.validadores = validadores;
         this.validadoresCancelamento = validadoresCancelamento;
+        this.validadorAtualizacaoConsulta = validadorAtualizacaoConsulta;
     }
 
     @Transactional
@@ -79,19 +89,27 @@ public class ConsultaService {
 
     @Transactional
     public ConsultaResponseDTO editConsultation(Long consultaId, ConsultaUpdateDTO dto) {
+
         Consulta consulta = consultaRepository.findById(consultaId)
                 .orElseThrow(() -> new ConsultaNotFoundException("Consulta não encontrada!"));
+        validadorAtualizacaoConsulta.validar(consultaId, consulta, dto);
         Medico medico = medicoRepository.findById(dto.medicoId())
                 .orElseThrow(() -> new MedicoNotFoundException("Médico não encontrado!"));
-        boolean existeConflito = consultaRepository.existsByMedicoIdAndDataAndIdNot(medico.getId(), dto.data(), consultaId);
-        if (existeConflito) {
-            throw new IllegalArgumentException("Já existe uma consulta com esse médico nesse horário.");
-        }
+        boolean existeConflito = consultaRepository
+                .existsByMedicoIdAndDataAndIdNot(
+                        medico.getId(),
+                        dto.data(),
+                        consultaId
+                );
 
+        if (existeConflito) {
+            throw new RegraNegocioException(
+                    "Já existe uma consulta com esse médico nesse horário."
+            );
+        }
         consulta.setMedico(medico);
         consulta.setData(dto.data());
-        Consulta consultaAtualizada = consultaRepository.save(consulta);
-        return consultaMapper.toDTO(consultaAtualizada);
+        return consultaMapper.toDTO(consultaRepository.save(consulta));
     }
 
     public Page<ConsultaResponseDTO> listConsultations(Pageable pageable) {
