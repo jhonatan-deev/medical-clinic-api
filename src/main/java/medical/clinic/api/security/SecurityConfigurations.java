@@ -3,6 +3,7 @@ package medical.clinic.api.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,20 +23,44 @@ public class SecurityConfigurations {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/",
-                                "/api/v1/auth/login",
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html"
-                        ).permitAll().anyRequest().authenticated()
-                )
-                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+
+        return http.csrf(csrf -> csrf.disable()).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).authorizeHttpRequests(auth -> auth
+
+                // Públicas
+                .requestMatchers("/", "/api/v1/auth/login", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+
+                // Médicos
+                .requestMatchers(HttpMethod.GET, "/api/v1/medicos/**").hasAnyRole("ADMIN", "ATENDENTE", "MEDICO")
+
+                .requestMatchers(HttpMethod.POST, "/api/v1/medicos/**").hasRole("ADMIN")
+
+                .requestMatchers(HttpMethod.PUT, "/api/v1/medicos/**").hasAnyRole("ADMIN", "MEDICO")
+
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/medicos/**").hasRole("ADMIN")
+
+
+                // Pacientes
+                .requestMatchers(HttpMethod.GET, "/api/v1/pacientes/**").hasAnyRole("ADMIN", "ATENDENTE", "PACIENTE")
+
+                .requestMatchers(HttpMethod.POST, "/api/v1/pacientes/**").hasAnyRole("ADMIN", "ATENDENTE")
+
+                .requestMatchers(HttpMethod.PUT, "/api/v1/pacientes/**").hasAnyRole("ADMIN", "ATENDENTE", "PACIENTE")
+
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/pacientes/**").hasAnyRole("ADMIN", "ATENDENTE")
+
+
+                // Consultas
+                .requestMatchers(HttpMethod.GET, "/api/v1/consultas/**").hasAnyRole("ADMIN", "ATENDENTE", "MEDICO", "PACIENTE")
+
+                .requestMatchers(HttpMethod.PUT, "/api/v1/consultas/**").hasAnyRole("ADMIN", "ATENDENTE", "MEDICO")
+
+                .requestMatchers(HttpMethod.POST, "/api/v1/consultas").hasAnyRole("ADMIN", "ATENDENTE")
+
+                .requestMatchers(HttpMethod.POST, "/api/v1/consultas/cancelar").hasAnyRole("ADMIN", "ATENDENTE", "MEDICO")
+
+
+                // Qualquer outra rota precisa estar autenticada
+                .anyRequest().authenticated()).addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
     }
 
     @Bean

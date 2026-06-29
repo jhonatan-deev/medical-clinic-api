@@ -14,6 +14,10 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
            LocalDateTime fim
    );
    Page<Consulta> findByAtivaTrue(Pageable pageable);
-
+   boolean existsByMedicoIdAndDataAndIdNot(
+           Long medicoId,
+           LocalDateTime data,
+           Long id
+   );
    boolean existsByMedicoIdAndData(Long medicoId, LocalDateTime data);
 }
