@@ -49,7 +49,7 @@ public class Usuario implements UserDetails {
         }
     }
 
-    private void validarSenha(String senha) {
+    public static void validarSenha(String senha) {
         if (senha == null || senha.length() < 6) {
             throw new IllegalArgumentException("A senha deve ter no mínimo 6 caracteres.");
         }

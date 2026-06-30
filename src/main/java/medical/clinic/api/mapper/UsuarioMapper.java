@@ -18,6 +18,7 @@ public class UsuarioMapper {
     }
 
     public Usuario toEntity(UsuarioRequestDTO dto, Perfil perfil) {
+        Usuario.validarSenha(dto.senha());
         Usuario usuario = new Usuario();
         usuario.setEmail(dto.email());
         usuario.setSenha(passwordEncoder.encode(dto.senha()));
