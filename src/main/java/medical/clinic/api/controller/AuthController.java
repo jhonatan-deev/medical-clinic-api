@@ -3,11 +3,13 @@ package medical.clinic.api.controller;
 import jakarta.validation.Valid;
 import medical.clinic.api.dto.LoginRequest;
 import medical.clinic.api.dto.TokenResponse;
+import medical.clinic.api.dto.password.ForgotPasswordRequest;
+import medical.clinic.api.dto.password.ResetPasswordRequest;
 import medical.clinic.api.dto.usuario.UsuarioUpdateSenhaDTO;
 import medical.clinic.api.model.Usuario;
 import medical.clinic.api.security.JwtService;
+import medical.clinic.api.service.PasswordResetService;
 import medical.clinic.api.service.UsuarioService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,14 +22,14 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final UsuarioService usuarioService;
+    private final JwtService tokenService;
+    private final PasswordResetService passwordResetService;
 
-    @Autowired
-    private JwtService tokenService;
-    private TokenResponse tokenResponse;
-
-    public AuthController(AuthenticationManager authenticationManager, UsuarioService usuarioService) {
+    public AuthController(AuthenticationManager authenticationManager, UsuarioService usuarioService, JwtService tokenService, PasswordResetService passwordResetService) {
         this.authenticationManager = authenticationManager;
         this.usuarioService = usuarioService;
+        this.tokenService = tokenService;
+        this.passwordResetService = passwordResetService;
     }
 
     @PostMapping("/login")
@@ -45,5 +47,21 @@ public class AuthController {
     ) {
         usuarioService.alterarSenha(dto, usuarioLogado);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(
+            @RequestBody @Valid ForgotPasswordRequest request) {
+        passwordResetService.solicitarRecuperacao(request.email());
+        return ResponseEntity.ok(
+                "Se o email informado estiver cadastrado, você receberá as instruções em breve."
+        );
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(
+            @RequestBody @Valid ResetPasswordRequest request) {
+        passwordResetService.redefinirSenha(request.token(), request.novaSenha());
+        return ResponseEntity.ok("Senha redefinida com sucesso. Você já pode fazer login.");
     }
 }
