@@ -11,7 +11,7 @@ import medical.clinic.api.mapper.MedicoMapper;
 import medical.clinic.api.model.Medico;
 import medical.clinic.api.model.Usuario;
 import medical.clinic.api.repository.MedicoRepository;
-import medical.clinic.api.repository.UsuarioRepository;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

@@ -27,12 +27,12 @@ public class SecurityConfigurations {
         return http.csrf(csrf -> csrf.disable()).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).authorizeHttpRequests(auth -> auth
 
                         // Públicas
-                        .requestMatchers("/", "/api/v1/auth/login", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/", "/api/v1/auth/login", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/api/v1/auth/reset-password" , "/api/v1/auth/forgot-password").permitAll()
 
                         // Médicos
                         .requestMatchers(HttpMethod.GET, "/api/v1/medicos/**").hasAnyRole("PACIENTE", "ATENDENTE")
 
-                        .requestMatchers(HttpMethod.POST, "/api/v1/medicos/**").hasRole("ATENDENTE")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/medicos/**").hasAnyRole("ATENDENTE", "ADMIN")
 
                         .requestMatchers(HttpMethod.PUT, "/api/v1/medicos/**").hasRole("ATENDENTE")
 
