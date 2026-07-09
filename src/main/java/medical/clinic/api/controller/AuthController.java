@@ -57,7 +57,7 @@ public class AuthController {
                 "Se o email informado estiver cadastrado, você receberá as instruções em breve."
         );
     }
-
+    // rota para definir nova senha
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(
             @RequestBody @Valid ResetPasswordRequest request) {

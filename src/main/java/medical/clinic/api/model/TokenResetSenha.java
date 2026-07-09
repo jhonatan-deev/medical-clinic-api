@@ -2,11 +2,14 @@ package medical.clinic.api.model;
 
 
 import jakarta.persistence.*;
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "password_reset_tokens")
-public class PasswordResetToken {
+@Getter
+public class TokenResetSenha {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,9 +27,9 @@ public class PasswordResetToken {
 
     private boolean used;
 
-    public PasswordResetToken() {}
+    public TokenResetSenha() {}
 
-    public PasswordResetToken(String token, Usuario usuario) {
+    public TokenResetSenha(String token, Usuario usuario) {
         this.token = token;
         this.usuario = usuario;
         this.expiresAt = LocalDateTime.now().plusMinutes(30);
@@ -37,16 +40,6 @@ public class PasswordResetToken {
         return LocalDateTime.now().isAfter(this.expiresAt);
     }
 
-
-    public Long getId() { return id; }
-
-    public String getToken() { return token; }
-
-    public Usuario getUsuario() { return usuario; }
-
-    public LocalDateTime getExpiresAt() { return expiresAt; }
-
-    public boolean isUsed() { return used; }
 
     public void setUsed(boolean used) { this.used = used; }
 }

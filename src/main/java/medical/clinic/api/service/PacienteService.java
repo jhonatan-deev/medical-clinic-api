@@ -33,7 +33,7 @@ public class PacienteService {
         if (pacienteRepository.existsByCpf(dto.cpf())) {
             throw new DuplicateResourceException("CPF já existente.");
         }
-        Usuario usuario = usuarioService.criarUsuario(dto.usuario(), Perfil.PACIENTE);
+        Usuario usuario = usuarioService.criarUsuario(dto.usuario(), Perfil.PACIENTE, false);
         Paciente paciente = pacienteMapper.toEntity(dto);
         paciente.setUsuario(usuario);
         Paciente salvo = pacienteRepository.save(paciente);

@@ -27,11 +27,11 @@ public class UsuarioService {
     }
 
     @Transactional
-    public Usuario criarUsuario(UsuarioRequestDTO dto, Perfil perfil) {
+    public Usuario criarUsuario(UsuarioRequestDTO dto, Perfil perfil, boolean ativo) {
         if (usuarioRepository.existsByEmail(dto.email())) {
             throw new DuplicateResourceException("Email já cadastrado.");
         }
-        Usuario usuario = usuarioMapper.toEntity(dto, perfil);
+        Usuario usuario = usuarioMapper.toEntity(dto, perfil, ativo);
         return usuarioRepository.save(usuario);
     }
 

@@ -2,10 +2,9 @@ package medical.clinic.api.service;
 
 
 import medical.clinic.api.exception.TokenInvalidoException;
-import medical.clinic.api.model.PasswordResetToken;
+import medical.clinic.api.model.TokenResetSenha;
 import medical.clinic.api.repository.PasswordResetTokenRepository;
 import medical.clinic.api.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,14 +36,14 @@ public class PasswordResetService {
             // Garante que apenas um link de reset esteja ativo por vez.
             tokenRepository.deleteAllByUsuario(usuario);
             String token = UUID.randomUUID().toString();
-            tokenRepository.save(new PasswordResetToken(token, usuario));
+            tokenRepository.save(new TokenResetSenha(token, usuario));
             emailService.enviarEmailDeRecuperacao(email, token);
         });
     }
 
     @Transactional
     public void redefinirSenha(String token, String novaSenha) {
-        PasswordResetToken resetToken = tokenRepository.findByToken(token)
+        TokenResetSenha resetToken = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new TokenInvalidoException("Token inválido ou inexistente."));
         if (resetToken.isExpired()) {
             throw new TokenInvalidoException("Token expirado. Solicite um novo link de recuperação.");
