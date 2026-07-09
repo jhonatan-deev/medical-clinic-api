@@ -34,13 +34,18 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private Perfil perfil;
 
-    public Usuario(String email, String senha, Perfil perfil) {
+    @Setter
+    @Column(nullable = false)
+    private boolean ativo;
+
+    public Usuario(String email, String senha, Perfil perfil, boolean ativo) {
         validarEmail(email);
         validarSenha(senha);
 
         this.email = email;
         this.senha = senha;
         this.perfil = perfil;
+        this.ativo = ativo;
     }
 
     private void validarEmail(String email) {
@@ -61,11 +66,11 @@ public class Usuario implements UserDetails {
                 new SimpleGrantedAuthority("ROLE_" + perfil.name())
         );
     }
-
+    @Override public boolean isEnabled() { return ativo; }
     @Override public String getPassword() { return senha; }
     @Override public String getUsername() { return email; }
     @Override public boolean isAccountNonExpired() { return true; }
     @Override public boolean isAccountNonLocked() { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled() { return true; }
+
 }

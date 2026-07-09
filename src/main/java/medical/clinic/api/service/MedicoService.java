@@ -36,7 +36,8 @@ public class MedicoService {
         }
         Usuario usuario = usuarioService.criarUsuario(
                 dto.usuario(),
-                Perfil.MEDICO
+                Perfil.MEDICO,
+                true
         );
         Medico medico = medicoMapper.toEntity(dto);
         medico.setUsuario(usuario);
