@@ -5,11 +5,14 @@ import jakarta.validation.Valid;
 import medical.clinic.api.dto.paciente.PacienteRequestDTO;
 import medical.clinic.api.dto.paciente.PacienteResponseDTO;
 import medical.clinic.api.dto.paciente.PacienteUpdateDTO;
+import medical.clinic.api.enuns.Perfil;
+import medical.clinic.api.model.Usuario;
 import medical.clinic.api.service.PacienteService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,13 +30,22 @@ public class PacienteController {
             @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
         return  ResponseEntity.ok(pacienteService.listPatients(pageable));
     }
-
+    // @AuthenticationPrincipal injeta o usuário autenticado.
+    // Se houver um atendente autenticado, executa o fluxo de cadastro do atendente
+    // Caso contrário, executa o fluxo do paciente se cadastrando.
     @PostMapping
     public ResponseEntity<PacienteResponseDTO> createPatient(
-            @Valid @RequestBody PacienteRequestDTO pacienteRequestDTO) {
-            PacienteResponseDTO pacienteResponseDTO = pacienteService.createPatient(pacienteRequestDTO);
-            return ResponseEntity.status(201)
-                    .body(pacienteResponseDTO);
+            @Valid @RequestBody PacienteRequestDTO pacienteRequestDTO,
+            @AuthenticationPrincipal Usuario usuarioLogado) {
+
+        boolean chamadoPorAtendente = usuarioLogado != null
+                && usuarioLogado.getPerfil() == Perfil.ATENDENTE;
+
+        PacienteResponseDTO pacienteResponseDTO = chamadoPorAtendente
+                ? pacienteService.atendenteCadastrarPaciente(pacienteRequestDTO)
+                : pacienteService.createPatiente(pacienteRequestDTO);
+
+        return ResponseEntity.status(201).body(pacienteResponseDTO);
     }
 
     @PutMapping("/{id}")
