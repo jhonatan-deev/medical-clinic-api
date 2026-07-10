@@ -17,12 +17,13 @@ public class UsuarioMapper {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Usuario toEntity(UsuarioRequestDTO dto, Perfil perfil) {
+    public Usuario toEntity(UsuarioRequestDTO dto, Perfil perfil, boolean ativo) {
         Usuario.validarSenha(dto.senha());
         Usuario usuario = new Usuario();
         usuario.setEmail(dto.email());
         usuario.setSenha(passwordEncoder.encode(dto.senha()));
         usuario.setPerfil(perfil);
+        usuario.setAtivo(ativo);
         return usuario;
     }
 

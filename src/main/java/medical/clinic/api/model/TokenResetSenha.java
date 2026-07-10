@@ -3,6 +3,7 @@ package medical.clinic.api.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -25,7 +26,9 @@ public class TokenResetSenha {
     @Column(nullable = false)
     private LocalDateTime expiresAt;
 
-    private boolean used;
+    @Column(nullable = false)
+    @Setter
+    private boolean usado;
 
     public TokenResetSenha() {}
 
@@ -33,13 +36,10 @@ public class TokenResetSenha {
         this.token = token;
         this.usuario = usuario;
         this.expiresAt = LocalDateTime.now().plusMinutes(30);
-        this.used = false;
+        this.usado = false;
     }
 
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(this.expiresAt);
     }
-
-
-    public void setUsed(boolean used) { this.used = used; }
 }

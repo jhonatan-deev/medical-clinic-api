@@ -39,7 +39,7 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/medicos/**").hasRole("ATENDENTE")
 
                         // Pacientes
-                        .requestMatchers(HttpMethod.GET, "/api/v1/pacientes/**").hasRole("ATENDENTE")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/pacientes/**").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/v1/pacientes/**").hasRole("ATENDENTE")
 
