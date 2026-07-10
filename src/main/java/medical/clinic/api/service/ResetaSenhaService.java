@@ -12,14 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Service
-public class PasswordResetService {
+public class ResetaSenhaService {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordResetTokenRepository tokenRepository;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
 
-    public PasswordResetService(UsuarioRepository usuarioRepository, PasswordResetTokenRepository tokenRepository, EmailService emailService, PasswordEncoder passwordEncoder) {
+    public ResetaSenhaService(UsuarioRepository usuarioRepository, PasswordResetTokenRepository tokenRepository, EmailService emailService, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.tokenRepository = tokenRepository;
         this.emailService = emailService;
@@ -48,14 +48,14 @@ public class PasswordResetService {
         if (resetToken.isExpired()) {
             throw new TokenInvalidoException("Token expirado. Solicite um novo link de recuperação.");
         }
-        if (resetToken.isUsed()) {
+        if (resetToken.isUsado()) {
             throw new TokenInvalidoException("Este link já foi utilizado. Solicite um novo.");
         }
 
         var usuario = resetToken.getUsuario();
         usuario.setSenha(passwordEncoder.encode(novaSenha));
         usuarioRepository.save(usuario);
-        resetToken.setUsed(true);
+        resetToken.setUsado(true);
         tokenRepository.save(resetToken);
     }
 }

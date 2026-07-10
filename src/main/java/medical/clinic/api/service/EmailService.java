@@ -40,4 +40,23 @@ public class EmailService {
 
         mailSender.send(message);
     }
+
+    public void enviarEmailDeConfirmacao(String destinatario, String token) {
+        String link = frontendUrl + "/confirmar-conta?token=" + token;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(destinatario);
+        message.setSubject("Confirme sua conta");
+        message.setText("""
+            Olá!
+
+            Recebemos seu cadastro em nossa clínica. Para ativar sua conta e poder fazer login, clique no link abaixo (válido por 24 horas):
+
+            %s
+
+            Se você não fez esse cadastro, ignore este email.
+            """.formatted(link));
+
+        mailSender.send(message);
+    }
 }
