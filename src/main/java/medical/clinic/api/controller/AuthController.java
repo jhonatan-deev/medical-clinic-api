@@ -8,6 +8,7 @@ import medical.clinic.api.dto.password.ResetPasswordRequest;
 import medical.clinic.api.dto.usuario.UsuarioUpdateSenhaDTO;
 import medical.clinic.api.model.Usuario;
 import medical.clinic.api.security.JwtService;
+import medical.clinic.api.service.ConfirmacaoContaService;
 import medical.clinic.api.service.ResetaSenhaService;
 import medical.clinic.api.service.UsuarioService;
 import org.springframework.http.ResponseEntity;
@@ -24,12 +25,14 @@ public class AuthController {
     private final UsuarioService usuarioService;
     private final JwtService tokenService;
     private final ResetaSenhaService resetaSenhaService;
+    private final ConfirmacaoContaService confirmacaoContaService;
 
-    public AuthController(AuthenticationManager authenticationManager, UsuarioService usuarioService, JwtService tokenService, ResetaSenhaService resetaSenhaService) {
+    public AuthController(AuthenticationManager authenticationManager, UsuarioService usuarioService, JwtService tokenService, ResetaSenhaService resetaSenhaService, ConfirmacaoContaService confirmacaoContaService) {
         this.authenticationManager = authenticationManager;
         this.usuarioService = usuarioService;
         this.tokenService = tokenService;
         this.resetaSenhaService = resetaSenhaService;
+        this.confirmacaoContaService = confirmacaoContaService;
     }
 
     @PostMapping("/login")
@@ -63,5 +66,11 @@ public class AuthController {
             @RequestBody @Valid ResetPasswordRequest request) {
         resetaSenhaService.redefinirSenha(request.token(), request.novaSenha());
         return ResponseEntity.ok("Senha redefinida com sucesso. Você já pode fazer login.");
+    }
+
+    @GetMapping("/confirmar-conta")
+    public ResponseEntity<String> confirmarConta(@RequestParam String token) {
+        confirmacaoContaService.confirmarConta(token);
+        return ResponseEntity.ok("Conta confirmada com sucesso! Você já pode fazer login.");
     }
 }

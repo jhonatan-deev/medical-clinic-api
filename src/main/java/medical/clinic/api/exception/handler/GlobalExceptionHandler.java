@@ -111,4 +111,17 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
+
+    // Captura a DisabledException, exceção nativa do Spring Security lançada
+    // quando um usuário tenta se autenticar com uma conta desativada (isEnabled() == false).
+    // Neste caso, retorna uma mensagem orientando o usuário a confirmar o e-mail.
+    @ExceptionHandler(org.springframework.security.authentication.DisabledException.class)
+    public ResponseEntity<ErrorResponseDTO> handleDisabled(org.springframework.security.authentication.DisabledException ex) {
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                HttpStatus.FORBIDDEN.value(),
+                "Conta ainda não confirmada. Verifique seu email para ativar o acesso.",
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
 }

@@ -27,7 +27,8 @@ public class SecurityConfigurations {
         return http.csrf(csrf -> csrf.disable()).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).authorizeHttpRequests(auth -> auth
 
                         // Públicas
-                        .requestMatchers("/", "/api/v1/auth/login", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/api/v1/auth/reset-password" , "/api/v1/auth/forgot-password").permitAll()
+                        .requestMatchers("/", "/api/v1/auth/login", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
+                                "/api/v1/auth/reset-password" , "/api/v1/auth/forgot-password", "/api/v1/auth/confirmar-conta").permitAll()
 
                         // Médicos
                         .requestMatchers(HttpMethod.GET, "/api/v1/medicos/**").hasAnyRole("PACIENTE", "ATENDENTE")
@@ -39,9 +40,9 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/medicos/**").hasRole("ATENDENTE")
 
                         // Pacientes
-                        .requestMatchers(HttpMethod.GET, "/api/v1/pacientes/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/pacientes/**").hasRole("ATENDENTE")
 
-                        .requestMatchers(HttpMethod.POST, "/api/v1/pacientes/**").hasRole("ATENDENTE")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/pacientes/**").permitAll()
 
                         .requestMatchers(HttpMethod.PUT, "/api/v1/pacientes/**").hasRole("ATENDENTE")
 

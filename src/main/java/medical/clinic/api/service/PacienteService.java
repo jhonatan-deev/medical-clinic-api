@@ -20,20 +20,41 @@ public class PacienteService {
     private final PacienteRepository pacienteRepository;
     private final PacienteMapper pacienteMapper;
     private final UsuarioService usuarioService;
+    private final ConfirmacaoContaService confirmacaoContaService;
 
-    public PacienteService(PacienteRepository pacienteRepository, PacienteMapper pacienteMapper, UsuarioService usuarioService) {
+    public PacienteService(PacienteRepository pacienteRepository, PacienteMapper pacienteMapper, UsuarioService usuarioService, ConfirmacaoContaService confirmacaoContaService) {
         this.pacienteRepository = pacienteRepository;
         this.pacienteMapper = pacienteMapper;
         this.usuarioService = usuarioService;
+        this.confirmacaoContaService = confirmacaoContaService;
     }
 
+    // Autocadastro do paciente.
+    // O usuário é criado como inativo e só poderá acessar o sistema
+    // após confirmar o e-mail por meio do token de confirmação.
     @Transactional
-    public PacienteResponseDTO createPatient(PacienteRequestDTO dto) {
+    public PacienteResponseDTO createPatiente(PacienteRequestDTO dto) {
 
         if (pacienteRepository.existsByCpf(dto.cpf())) {
             throw new DuplicateResourceException("CPF já existente.");
         }
         Usuario usuario = usuarioService.criarUsuario(dto.usuario(), Perfil.PACIENTE, false);
+        Paciente paciente = pacienteMapper.toEntity(dto);
+        paciente.setUsuario(usuario);
+        Paciente salvo = pacienteRepository.save(paciente);
+        confirmacaoContaService.enviarConfirmacao(usuario);
+        return pacienteMapper.toDTO(salvo);
+    }
+
+    // Cadastro realizado por um atendente.
+    // O usuário já é criado como ativo, pois não há necessidade de confirmação por e-mail.
+    @Transactional
+    public PacienteResponseDTO atendenteCadastrarPaciente(PacienteRequestDTO dto) {
+
+        if (pacienteRepository.existsByCpf(dto.cpf())) {
+            throw new DuplicateResourceException("CPF já existente.");
+        }
+        Usuario usuario = usuarioService.criarUsuario(dto.usuario(), Perfil.PACIENTE, true);
         Paciente paciente = pacienteMapper.toEntity(dto);
         paciente.setUsuario(usuario);
         Paciente salvo = pacienteRepository.save(paciente);
