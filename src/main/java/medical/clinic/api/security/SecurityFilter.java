@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import medical.clinic.api.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -16,15 +17,18 @@ import java.io.IOException;
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
+    private final UsuarioRepository usuarioRepository;
+    private final RoleHierarchy roleHierarchy;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    public SecurityFilter(JwtService jwtService, UsuarioRepository usuarioRepository, RoleHierarchy roleHierarchy) {
+        this.jwtService = jwtService;
+        this.usuarioRepository = usuarioRepository;
+        this.roleHierarchy = roleHierarchy;
+    }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         var tokenJWT = recuperarToken(request);
 
@@ -32,11 +36,12 @@ public class SecurityFilter extends OncePerRequestFilter {
             var email = jwtService.getSubject(tokenJWT); // ← Pega o email/login do token
 
             // Busca o usuário no banco
-            var usuario = usuarioRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+            var usuario = usuarioRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
             // CRIA A AUTENTICAÇÃO NO CONTEXTO DO SPRING
-            var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+            var authorities = roleHierarchy.getReachableGrantedAuthorities(usuario.getAuthorities());
+
+            var authentication = new UsernamePasswordAuthenticationToken(usuario, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             System.out.println("Usuário autenticado: " + email);

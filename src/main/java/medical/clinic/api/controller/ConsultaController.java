@@ -12,13 +12,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 
 @RestController
 @RequestMapping("/api/v1/consultas")
 @SecurityRequirement(name = "bearer-key")
 public class ConsultaController {
+
     private final ConsultaService consultaService;
 
     public ConsultaController(ConsultaService consultaService) {
@@ -26,25 +27,28 @@ public class ConsultaController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<ConsultaResponseDTO> createConsultation(@RequestBody @Valid ConsultaRequestDTO consultaRequestDTO) {
         ConsultaResponseDTO consulta = consultaService.createConsultation(consultaRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(consulta);
     }
 
     @PostMapping("/cancelar")
+    @PreAuthorize("hasAnyRole('PACIENTE', 'MEDICO', 'ATENDENTE')")
     public ResponseEntity<ConsultaResponseDTO> cancelConsultation(@RequestBody @Valid CancelamentoRequestDTO dto) {
         ConsultaResponseDTO consultaCancelada = consultaService.cancelConsultation(dto);
-        return ResponseEntity.status(HttpStatus.OK).body(consultaCancelada);
+        return ResponseEntity.ok(consultaCancelada);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<ConsultaResponseDTO> updateConsultation(@RequestBody @Valid ConsultaUpdateDTO dto, @PathVariable Long id) {
         ConsultaResponseDTO consultaAtualizada = consultaService.editConsultation(id, dto);
-        return ResponseEntity.status(HttpStatus.OK).body(consultaAtualizada);
-
+        return ResponseEntity.ok(consultaAtualizada);
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('MEDICO')")
     public ResponseEntity<Page<ConsultaResponseDTO>> listConsultations(@PageableDefault(size = 10, sort = "data") Pageable pageable) {
         return ResponseEntity.ok(consultaService.listConsultations(pageable));
     }
