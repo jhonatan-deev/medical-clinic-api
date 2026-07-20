@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,37 +25,43 @@ public class MedicoController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ATENDENTE')")
     public ResponseEntity<MedicoResponseDTO> createDoctor(@RequestBody @Valid MedicoRequestDTO dto) {
         MedicoResponseDTO medico = medicoService.createDoctor(dto);
         return ResponseEntity.status(201).body(medico);
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<Page<MedicoResponseDTO>> listDoctors(@PageableDefault(size = 10, sort = "nome") Pageable pageable) {
         return ResponseEntity.ok(medicoService.listDoctors(pageable));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ATENDENTE')")
     public ResponseEntity<MedicoResponseDTO> updateDoctor(@RequestBody MedicoUpdateDTO dto, @PathVariable Long id) {
         MedicoResponseDTO medico = medicoService.updateDoctor(dto, id);
-        return ResponseEntity.ok().body(medico);
+        return ResponseEntity.ok(medico);
     }
 
 //    @DeleteMapping("/{id}")
+//    @PreAuthorize("hasRole('ATENDENTE')")
 //    public ResponseEntity<Void> deleteMedical(@PathVariable Long id) {
 //        medicoService.deleteMedico(id);
 //        return ResponseEntity.noContent().build();
 //    }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ATENDENTE')")
     public ResponseEntity<Void> deactivateDoctor(@PathVariable Long id) {
         medicoService.deactivateDoctor(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<MedicoResponseDTO> findDoctorById(@PathVariable Long id) {
         MedicoResponseDTO medico = medicoService.findDoctorById(id);
-        return ResponseEntity.ok().body(medico);
+        return ResponseEntity.ok(medico);
     }
 }

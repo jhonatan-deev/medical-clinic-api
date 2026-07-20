@@ -1,6 +1,7 @@
 package medical.clinic.api.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import medical.clinic.api.security.handler.CustomAccessDeniedHandler;
+import medical.clinic.api.security.handler.CustomAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -22,17 +23,24 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfigurations {
 
-    @Autowired
-    private SecurityFilter securityFilter;
+    private final SecurityFilter securityFilter;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
+
+    public SecurityConfigurations(SecurityFilter securityFilter, CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler accessDeniedHandler) {
+
+        this.securityFilter = securityFilter;
+        this.authenticationEntryPoint = authenticationEntryPoint;
+        this.accessDeniedHandler = accessDeniedHandler;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         return http.csrf(csrf -> csrf.disable())
-
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                .authorizeHttpRequests(auth -> auth
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)).authorizeHttpRequests(auth -> auth
 
                         .requestMatchers("/", "/api/v1/auth/login", "/api/v1/auth/reset-password", "/api/v1/auth/forgot-password", "/api/v1/auth/confirmar-conta", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
@@ -70,14 +78,4 @@ public class SecurityConfigurations {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public RoleHierarchy roleHierarchy() {
-        RoleHierarchyImpl hierarchy = new RoleHierarchyImpl();
-        hierarchy.setHierarchy("""
-                ROLE_ADMIN > ROLE_ATENDENTE
-                ROLE_ATENDENTE > ROLE_MEDICO
-                ROLE_ATENDENTE > ROLE_PACIENTE
-                """);
-        return hierarchy;
-    }
 }
